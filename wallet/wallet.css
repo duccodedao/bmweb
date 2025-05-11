@@ -1,0 +1,732 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', 'Roboto', sans-serif;
+  background: #e0e5ec;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  color: #333;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+.swal-popup-custom {
+    top: 90px !important; /* Điều chỉnh khoảng cách từ trên xuống */
+    border-radius: 25px;
+  }
+
+#connect-only {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.container {
+  display: none;
+  background: #e0e5ec;
+  border-radius: 20px;
+  box-shadow: 10px 10px 25px #bec4d0, -10px -10px 25px #ffffff;
+  padding: 30px;
+  max-width: 100%; /* Đảm bảo chiều rộng container có thể co giãn */
+  width: 100%; /* Đảm bảo chiều rộng luôn là 100% của màn hình */
+  text-align: center;
+  overflow-y: auto;
+  max-height: 90vh;
+  margin-top: 90px;
+  margin-bottom: 90px;
+}
+
+h2 {
+  font-size: 22px;
+  margin-bottom: 18px;
+  color: #2e3a59;
+}
+
+.info {
+  font-size: 15px;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.balance {
+  font-size: 18px;
+  color: #009688;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+#wallet-address {
+  font-weight: 600;
+  color: #0077cc;
+  font-size: 20px;
+  word-break: break-word;
+}
+
+ul#transactions-list {
+  list-style: none;
+  margin-top: 20px;
+  padding: 0;
+}
+
+.transaction-item {
+  background: #e0e5ec;
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: inset 2px 2px 6px #c3c8d3, inset -2px -2px 6px #ffffff;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.transaction-item:hover {
+  transform: translateY(-2px);
+  box-shadow: inset 2px 2px 8px #b5bbc6, inset -2px -2px 8px #ffffff;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: #2f3d59;
+  margin-bottom: 6px;
+}
+
+.icon-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: #004c99;
+}
+
+.icon img {
+  width: 20px;
+  height: 20px;
+}
+
+.amount {
+  font-weight: 600;
+  color: #00796b;
+}
+
+.address {
+  font-size: 13px;
+  color: #444;
+  word-break: break-word;
+  padding-left: 24px;
+}
+
+.time {
+  font-size: 12px;
+  color: #888;
+  text-align: right;
+}
+
+a {
+  color: #0056b3;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.container::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+.container::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+#disconnect {
+  font-size: 16px;
+  margin-left: 3px;
+  cursor: pointer;
+  color: #FFF;
+  display: none;
+  transition: transform 0.2s ease;
+
+}
+
+
+@media (max-width: 600px) {
+  .container {
+    padding: 20px;
+    max-width: 92%;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  .info,
+  .balance,
+
+  .row,
+  .address,
+  .time {
+    font-size: 14px;
+  }
+
+  .transaction-item {
+    padding: 14px;
+  }
+
+  .icon img {
+    width: 18px;
+    height: 18px;
+  }
+
+
+}
+.memo {
+  font-size: 13px;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  width: 100%;
+  cursor: pointer;
+  text-align: left;
+  transition: max-height 0.3s ease;
+  max-height: 20px;
+  margin-bottom: 6px;
+  padding-left: 24px;
+}
+
+.memo.expanded {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  max-height: 300px;
+}
+
+
+
+
+    .form-send {
+  margin-top: 10px;
+  text-align: left;
+}
+
+.form-send input,
+.form-send button {
+  width: 100%;
+  padding: 10px;
+  margin: 1px 0;
+  border-radius: 25px;
+  border: none;
+  font-size: 16px;
+  box-shadow: inset 2px 2px 5px #c3c8d3, inset -2px -2px 5px #ffffff;
+}
+
+.form-send button {
+  background: #00796b;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 3px 3px 8px #a1a1a1;
+  transition: background 0.2s ease;
+}
+
+.form-send button:hover {
+  background: #004d40;
+}
+
+    #memo-text:disabled {
+  background-color: #f0f0f0;
+  color: #999;
+  cursor: not-allowed;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+    li {
+  position: relative;
+  padding-bottom: 30px; /* Chừa chỗ cho link ở dưới */
+}
+
+.tx-link-row {
+  position: absolute;
+  bottom: 5px;
+  right: 10px;
+}
+
+.tx-link-row a {
+  color: #007bff;
+  text-decoration: none;
+  font-size: 14px;
+}
+.tx-link-row a:hover {
+  text-decoration: underline;
+}
+
+
+
+
+
+
+
+
+
+
+.dan,
+.max-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: linear-gradient(135deg, #007bff, #00c6ff);
+  color: white;
+  font-size: 13px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.3s ease;
+  animation: popIn 0.4s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dan:hover,
+.max-btn:hover {
+  transform: translateY(-50%) scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 123, 255, 0.3);
+  background: linear-gradient(135deg, #0056b3, #00a2ff);
+}
+
+@keyframes popIn {
+  0% {
+    transform: translateY(-50%) scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(-50%) scale(1);
+    opacity: 1;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.input-icon {
+  position: relative;
+  margin: 10px 0;
+}
+
+.input-icon .icon {
+  position: absolute;
+  top: 50%;
+  left: 15px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  font-size: 18px;
+  color: #555;
+}
+
+.input-icon input {
+  padding-left: 45px !important;
+}
+
+.input-logo {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  border-radius: 25px;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .container {
+    padding: 20px;
+    max-width: 92%;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  .info,
+  .balance,
+
+  .row,
+  .address,
+  .time,
+  .memo {
+    font-size: 16px;
+  }
+
+  .transaction-item {
+    padding: 14px;
+    padding-bottom: 6px;
+  }
+
+  .icon img {
+    width: 18px;
+    height: 18px;
+  }
+
+
+}
+
+
+
+
+
+
+
+
+
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 25px;
+  text-align: center;
+  width: 90%;
+  max-width: 350px;  /* Bạn có thể chỉnh sửa giá trị này nếu muốn */
+  position: relative;
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.qr-canvas {
+  margin: 10px auto;
+  width: 250px; /* Điều chỉnh kích thước QR code */
+  height: 250px; /* Điều chỉnh kích thước QR code */
+}
+
+.qr-address {
+  word-break: break-word;
+}
+
+
+/* Nút Copy */
+.copy-btn {
+  width: 100%;
+  max-width: 300px;
+  margin-top: 20px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 25px;
+  background: #0077cc;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.copy-btn i {
+  margin-right: 8px;
+}
+
+.copy-btn:hover {
+  background-color: #005fa3;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Đảm bảo các nút được căn chỉnh đúng */
+.button-container {
+  display: flex;
+  flex-direction: column; /* Xếp các nút theo chiều dọc */
+  align-items: stretch; /* Giãn các nút theo chiều ngang */
+  width: 100%; /* Chiếm toàn bộ chiều rộng */
+  padding: 20px; /* Khoảng cách xung quanh container */
+  box-sizing: border-box; /* Đảm bảo padding không ảnh hưởng đến kích thước */
+}
+
+/* Các nút được giãn ngang với chiều dài tự động */
+button {
+  width: 100%; /* Chiếm hết chiều rộng */
+  max-width: 100%; /* Giới hạn chiều rộng tối đa là 100% */
+  padding: 10px;
+  text-align: center; /* Canh giữa văn bản */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  outline: none;
+  background-color: #f0f0f0;
+  border-radius: 25px;
+  margin: 10px 0; /* Khoảng cách giữa các nút */
+  cursor: pointer;
+  box-sizing: border-box; /* Đảm bảo padding không ảnh hưởng đến chiều rộng */
+}
+
+/* Khoảng cách giữa biểu tượng và văn bản trong nút */
+button i {
+  margin-right: 8px;
+}
+
+
+
+/* Nút ở hàng trên */
+#send-ton-btn {
+  margin-bottom: 20px; /* Khoảng cách giữa nút này và các nút dưới */
+}
+
+/* Các nút ở hàng dưới sẽ hiển thị theo hàng ngang */
+.button-row {
+  display: flex;
+  justify-content: space-between; /* Giãn cách đều các nút */
+  width: 100%; /* Chiếm toàn bộ chiều rộng */
+  gap: 10px; /* Khoảng cách giữa các nút */
+  flex-wrap: wrap; /* Cho phép các nút gói gọn lại khi không đủ không gian */
+}
+
+/* Đặc biệt cho các nút ở hàng dưới */
+#show-qr-btn, #disconnect {
+  flex: 1 1 45%; /* Các nút sẽ chiếm 45% chiều rộng và có thể thu nhỏ hoặc giãn nở */
+  max-width: 100%; /* Đảm bảo chiều rộng không vượt quá 100% */
+}
+
+
+
+
+    
+
+#list {
+  min-height: 100px; /* đảm bảo có đủ không gian để căn giữa */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #666;
+  font-size: 16px;
+  gap: 10px;
+}
+
+.spinner {
+  width: 30px;
+  height: 30px;
+  border: 4px solid #ccc;
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+
+
+
+
+
+
+.amount {
+  font-weight: bold;
+}
+
+.amount.red {
+  color: red;
+}
+
+.amount.green {
+  color: green;
+}
+
+.amount.black {
+  color: black;
+}
+
+
+
+
+
+
+
+
+
+
+/* Overlay: nền mờ toàn màn hình */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.35);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  backdrop-filter: blur(2px);
+  cursor: pointer; /* Thêm con trỏ để người dùng nhận biết có thể nhấn vào */
+}
+
+/* Nội dung popup */
+.popup-content {
+  background: #fff;
+  border-radius: 16px;
+  padding: 30px 25px;
+  max-width: 480px;
+  width: 95%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  position: relative;
+  animation: popupFadeIn 0.3s ease-out;
+  font-family: 'Segoe UI', sans-serif;
+  color: #2b2b2b;
+  cursor: default; /* Đảm bảo rằng nội dung popup không có cursor pointer */
+}
+
+/* Nút đóng X */
+.popup-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  color: #888;
+  cursor: pointer;
+  transition: 0.2s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+}
+
+.popup-close:before {
+  content: "×";
+  font-size: 22px;
+  color: #888;
+}
+
+.popup-close:hover {
+  color: #fff;
+  background-color: #f44336; /* Màu đỏ khi hover */
+  transform: scale(1.1);
+}
+
+/* Tiêu đề popup */
+.popup-content h2 {
+  margin: 0 0 16px;
+  font-size: 22px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+/* Đoạn văn bản */
+.popup-content p {
+  margin: 10px 0;
+  font-size: 15px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+/* Link xem trên Tonviewer */
+.popup-content a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.popup-content a:hover {
+  text-decoration: underline;
+}
+
+/* Hiệu ứng mở popup */
+@keyframes popupFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+

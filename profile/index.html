@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thông Tin Cá Nhân Telegram + TON Connect</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="/css/footer.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="/js/ton-connect-bmass.js"></script>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+
+<body>
+
+  <!-- Khi chưa kết nối ví -->
+  <div id="connect-only">
+    <div id="connect-wallet">
+
+    </div>
+  </div>
+
+  <!-- Nội dung chính sau khi kết nối -->
+  <div id="main-content" class="container" style="display: none; margin: 16px; margin-top: 85px;">
+    
+    <!-- Nút container -->
+    <div class="btn-container">
+      <a href="/index/jetton.html" class="btn btn-jetton">
+        <i class="fas fa-coins"></i> Jetton
+      </a>
+      <a href="/index/wallet_new.html" class="btn btn-wallet">
+        <i class="fas fa-wallet"></i> Wallet
+      </a>
+      <div class="btn" id="disconnect">
+        <i class="fas fa-sign-out-alt"></i> Disconnect
+      </div>
+    </div>
+
+
+
+<!-- Thông tin người dùng -->
+<div class="info-container">
+
+  <div class="info-item">
+    <div class="row">
+      <div>Avatar</div>
+      <div id="avatar">
+        <img id="tg-avatar" alt="User Avatar" width="100" height="100" style="border-radius: 50%;" />
+      </div>
+    </div>
+  </div>
+
+  <div class="info-item">
+    <div class="row">
+      <div>Username</div>
+      <div class="wallet-address">
+        <span id="tg-username">Loading...</span>
+        <i class="fa-regular fa-copy" id="copy-username" style="cursor: pointer; margin-left: 8px; color: #4CAF50;"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-item">
+    <div class="row">
+      <div>Name</div>
+      <div class="wallet-address">
+        <span id="tg-name">Loading...</span>
+        <i class="fa-regular fa-copy" id="copy-name" style="cursor: pointer; margin-left: 8px; color: #4CAF50;"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-item">
+    <div class="row">
+      <div>ID</div>
+      <div class="wallet-address">
+        <span id="tg-id">Loading...</span>
+        <i class="fa-regular fa-copy" id="copy-id" style="cursor: pointer; margin-left: 8px; color: #4CAF50;"></i>
+      </div>
+    </div>
+  </div>
+
+
+<!-- Hiển thị base64 -->
+<div class="info-item">
+  <div class="row">
+    <div>Address (base64):</div>
+    <div class="wallet-address">
+      <span id="short-address">...</span>
+      <i id="copy-base64-icon" class="fa-regular fa-copy" style="cursor: pointer; margin-left: 8px; color: #4CAF50;"></i>
+    </div>
+  </div>
+</div>
+
+<!-- Hiển thị Friendly Address -->
+<div class="info-item">
+  <div class="row">
+    <div>Address Friendly:</div>
+    <div class="wallet-address">
+      <span id="friendly-address">...</span>
+      <i id="copy-friendly-icon" class="fa-regular fa-copy" style="cursor: pointer; margin-left: 8px; color: #4CAF50;"></i>
+    </div>
+  </div>
+</div>
+
+
+
+  <!-- Balance -->
+  <div class="info-item">
+    <div class="row">
+      <div>Balance</div>
+      <div id="ton-balance">Loading...</div>
+     
+    </div>
+  </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+const tg = window.Telegram.WebApp;
+tg.ready();
+// Nút back luôn luôn bật
+    tg.BackButton.show();
+
+    // Khi bấm vào nút back của Telegram
+    tg.BackButton.onClick(() => {
+      window.history.back(); // Quay lại trang trước khi người dùng mở trang này
+    });
+const user = tg.initDataUnsafe.user;
+if (user) {
+  const name = `${user.first_name || ''} ${user.last_name || ''}`.trim();
+  const username = `@${user.username || 'Không có'}`;
+  const userId = user.id;
+
+  document.getElementById("tg-name").textContent = name;
+  document.getElementById("tg-username").textContent = username;
+  document.getElementById("tg-id").textContent = userId;
+
+  // Thêm sự kiện copy
+  const showCopySuccess = (text) => {
+    Swal.fire({
+      icon: 'success',
+      title: 'Đã sao chép!',
+      text: `${text} đã được sao chép vào clipboard.`,
+      timer: 1500,
+      showConfirmButton: false
+    });
+  };
+
+  const copyText = (text, label) => {
+    navigator.clipboard.writeText(text).then(() => {
+      showCopySuccess(label);
+    }).catch(() => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Thất bại',
+        text: `Không thể sao chép ${label}.`,
+        timer: 1500,
+        showConfirmButton: false
+      });
+    });
+  };
+
+  document.getElementById("copy-name").onclick = () => copyText(name, "Tên");
+  document.getElementById("copy-username").onclick = () => copyText(username, "Username");
+  document.getElementById("copy-id").onclick = () => copyText(userId.toString(), "ID");
+
+  const avatarElement = document.getElementById("tg-avatar");
+  const photoURL = user.photo_url ? user.photo_url : "/logo-coin/bmlogo.jpg";
+  avatarElement.src = photoURL;
+  avatarElement.onerror = function () {
+    this.onerror = null;
+    this.src = "/logo-coin/bmlogo.jpg";
+  };
+}
+
+let base64Addr = "";
+let b64urlAddr = "";
+
+const connector = new TON_CONNECT_UI.TonConnectUI({
+  manifestUrl: "https://bmweb.site/tonconnect-manifest.json",
+  buttonRootId: "connect-wallet"
+});
+
+connector.onStatusChange(async (wallet) => {
+  if (wallet) {
+    const rawAddress = wallet.account.address;
+
+    document.getElementById("connect-only").style.display = "none";
+    document.getElementById("main-content").style.display = "block";
+
+  
+
+
+
+// Lấy thông tin base64 từ API
+try {
+  const res = await fetch(`https://toncenter.com/api/v2/getExtendedAddressInformation?address=${rawAddress}`);
+  const data = await res.json();
+
+  if (data.ok && data.result?.address?.account_address) {
+    const base64Addr = data.result.address.account_address;
+    const shortRawAddress = `${base64Addr.slice(0, 5)}...${base64Addr.slice(-5)}`;
+    document.getElementById("short-address").textContent = shortRawAddress;
+
+    const copyBase64 = () => {
+      navigator.clipboard.writeText(base64Addr).then(() => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Đã sao chép!',
+          text: `Địa chỉ base64 đã được sao chép.`,
+          timer: 2000,
+          showConfirmButton: false
+        });
+      }).catch(() => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Thất bại',
+          text: `Không thể sao chép địa chỉ base64.`,
+          timer: 2000,
+          showConfirmButton: false
+        });
+      });
+    };
+
+    document.getElementById("short-address").onclick = copyBase64;
+    document.getElementById("copy-base64-icon").onclick = copyBase64;
+  } else {
+    document.getElementById("short-address").textContent = "Không thể lấy ví.";
+  }
+} catch (err) {
+  document.getElementById("short-address").textContent = "Lỗi API.";
+}
+
+// Lấy thông tin Friendly từ API
+try {
+  const detectRes = await fetch(`https://toncenter.com/api/v2/detectAddress?address=${rawAddress}`);
+  const detectData = await detectRes.json();
+
+  if (detectData.ok && detectData.result) {
+    const friendlyAddr = detectData.result.non_bounceable.b64url;
+    const shortFriendly = `${friendlyAddr.slice(0, 5)}...${friendlyAddr.slice(-5)}`;
+    document.getElementById("friendly-address").textContent = shortFriendly;
+
+    const copyFriendly = () => {
+      navigator.clipboard.writeText(friendlyAddr).then(() => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Đã sao chép!',
+          text: `Địa chỉ Friendly đã được sao chép.`,
+          timer: 2000,
+          showConfirmButton: false
+        });
+      }).catch(() => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Thất bại',
+          text: `Không thể sao chép địa chỉ Friendly.`,
+          timer: 2000,
+          showConfirmButton: false
+        });
+      });
+    };
+
+    document.getElementById("friendly-address").onclick = copyFriendly;
+    document.getElementById("copy-friendly-icon").onclick = copyFriendly;
+  } else {
+    document.getElementById("friendly-address").textContent = "Không thể lấy ví.";
+  }
+} catch (err) {
+  document.getElementById("friendly-address").textContent = "Lỗi API.";
+}
+
+
+
+
+
+
+
+
+
+
+    // Lấy số dư TON
+    try {
+      const balanceRes = await fetch(`https://tonapi.io/v2/accounts/${rawAddress}`);
+      const balanceData = await balanceRes.json();
+      if (balanceData.balance) {
+        const ton = parseFloat(balanceData.balance / Math.pow(10, 9)).toFixed(9);
+        document.getElementById("ton-balance").textContent = `${ton} TON`;
+      }
+    } catch (err) {
+      document.getElementById("ton-balance").textContent = "Lỗi lấy số dư.";
+    }
+  }
+});
+
+// Ngắt kết nối ví
+document.getElementById("disconnect").onclick = async () => {
+  const disconnectButton = document.getElementById("disconnect");
+  disconnectButton.classList.add("spin");
+
+  try {
+    await connector.disconnect();
+    document.getElementById("main-content").style.display = "none";
+    document.getElementById("connect-only").style.display = "flex";
+    Swal.fire({
+      icon: 'info',
+      title: 'Đã ngắt kết nối',
+      text: 'Bạn đã ngắt kết nối ví TON.',
+      timer: 2000,
+      showConfirmButton: false
+    });
+  } catch (error) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Lỗi',
+      text: 'Không thể ngắt kết nối ví.',
+    });
+  } finally {
+    disconnectButton.classList.remove("spin");
+  }
+};
+
+
+</script>
+</body>
+</html>

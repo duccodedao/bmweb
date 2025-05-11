@@ -1,0 +1,594 @@
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Body */
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f2f5;
+    padding: 20px;
+    color: #333;
+  }
+  
+  /* Kết nối ví */
+  #connect-only {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  #connect-wallet {
+ 
+
+    padding: 16px 30px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+  }
+  
+
+  
+  /* Container chính */
+  .container {
+    max-width: 800px;
+    margin: auto;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 25px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Nút container */
+  .btn-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);  /* 3 cột */
+    gap: 10px;  /* Khoảng cách giữa các nút */
+    justify-content: center;
+    margin: 10px 0;
+    width: 100%;
+  }
+  
+  /* Định dạng chung cho các nút */
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 6px 0;  /* Giảm padding thêm */
+    border: none;
+    border-radius: 25px;  /* Góc nút mềm mại hơn */
+    font-size: 12px;  /* Giảm kích thước chữ để làm nhỏ nút */
+    font-weight: bold;
+    text-decoration: none;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    text-transform: uppercase;
+    gap: 6px; /* Khoảng cách giữa icon và text */
+    height: 100%;  /* Đảm bảo chiều cao của nút bằng 100% */
+    width: 100%;   /* Đảm bảo chiều rộng của nút bằng nhau */
+    box-sizing: border-box;
+  }
+  
+  /* Nút Jetton */
+  .btn-jetton {
+    background-color: #4CAF50;
+  }
+  
+  .btn-jetton:hover {
+    background-color: #45a049;
+    transform: translateY(-3px);
+  }
+  
+  /* Nút Wallet */
+  .btn-wallet {
+    background-color: #008CBA;
+  }
+  
+  .btn-wallet:hover {
+    background-color: #007B9A;
+    transform: translateY(-3px);
+  }
+
+  
+  #disconnect:hover {
+    background-color: #d32f2f;
+    transform: translateY(-3px);
+  }
+  
+  /* Info container chia 2 cột */
+  .info-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  
+  /* Mỗi ô info */
+  .info-item {
+    background: #e0e5ec;
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: inset 2px 2px 6px #c3c8d3, inset -2px -2px 6px #ffffff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .info-item:hover {
+    transform: translateY(-2px);
+    box-shadow: inset 2px 2px 8px #b5bbc6, inset -2px -2px 8px #ffffff;
+  }
+  
+  /* Nội dung trong mỗi item */
+  .row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 15px;
+    color: #333;
+  }
+  
+  .row div:first-child {
+    font-weight: bold;
+    color: #555;
+  }
+  
+  /* Địa chỉ ví có thể sao chép */
+  #short-address {
+    cursor: pointer;
+    color: blue;
+    text-decoration: underline;
+    word-break: break-all;
+  }
+  
+  #copy-icon {
+    cursor: pointer;
+    color: #4CAF50;
+    margin-left: 8px;
+  }
+  
+  #copy-icon:hover {
+    color: #388E3C;
+  }
+  
+  /* Responsive: về 1 cột khi nhỏ */
+  @media (max-width: 600px) {
+    .info-container {
+      grid-template-columns: 1fr;
+    }
+  
+    .header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+  #tg-avatar {
+    border-radius: 50%;
+    height: 40px;
+    width: 40px;
+    object-fit: cover;
+  }
+  #short-address {
+    cursor: pointer;
+    color: #333;
+    text-decoration: none;
+    word-break: break-all;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/* Khi có lớp 'loading' sẽ xoay ngay tại nút Disconnect */
+#disconnect {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    background-color: #f44336;
+    color: white;
+    border-radius: 25px;
+    font-weight: bold;
+    font-size: 12px;
+    position: relative; /* Cần thiết để tạo hiệu ứng 'loading' */
+  }
+  
+  /* Thêm hiệu ứng spin cho nút Disconnect khi nó đang loading */
+  #disconnect.loading {
+    pointer-events: none; /* Ngừng click trong khi đang loading */
+    background-color: #d32f2f; /* Màu nền khi đang loading */
+  }
+  
+  #disconnect.loading:before {
+    content: "";
+    position: absolute;
+    border: 3px solid #fff;
+    border-top: 3px solid #4CAF50; /* Màu xoay */
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  
+  /* Định nghĩa hiệu ứng xoay */
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  /* Khi nhấn nút, thay đổi màu nền */
+  #disconnect:active {
+    background-color: #d32f2f;
+  }
+
+
+
+
+
+
+
+
+
+ /* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Body */
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f2f5;
+    padding: 20px;
+    color: #333;
+  }
+  
+  /* Kết nối ví */
+  #connect-only {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  #connect-wallet {
+ 
+
+    padding: 16px 30px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+  }
+  
+
+  
+  /* Container chính */
+  .container {
+    max-width: 800px;
+    margin: auto;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 25px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Nút container */
+  .btn-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);  /* 3 cột */
+    gap: 10px;  /* Khoảng cách giữa các nút */
+    justify-content: center;
+    margin: 10px 0;
+    width: 100%;
+  }
+  
+  /* Định dạng chung cho các nút */
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 6px 0;  /* Giảm padding thêm */
+    border: none;
+    border-radius: 25px;  /* Góc nút mềm mại hơn */
+    font-size: 12px;  /* Giảm kích thước chữ để làm nhỏ nút */
+    font-weight: bold;
+    text-decoration: none;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    text-transform: uppercase;
+    gap: 6px; /* Khoảng cách giữa icon và text */
+    height: 100%;  /* Đảm bảo chiều cao của nút bằng 100% */
+    width: 100%;   /* Đảm bảo chiều rộng của nút bằng nhau */
+    box-sizing: border-box;
+  }
+  
+  /* Nút Jetton */
+  .btn-jetton {
+    background-color: #4CAF50;
+  }
+  
+  .btn-jetton:hover {
+    background-color: #45a049;
+    transform: translateY(-3px);
+  }
+  
+  /* Nút Wallet */
+  .btn-wallet {
+    background-color: #008CBA;
+  }
+  
+  .btn-wallet:hover {
+    background-color: #007B9A;
+    transform: translateY(-3px);
+  }
+
+  
+  #disconnect:hover {
+    background-color: #d32f2f;
+    transform: translateY(-3px);
+  }
+  
+  /* Info container chia 2 cột */
+  .info-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  
+  /* Mỗi ô info */
+  .info-item {
+    background: #e0e5ec;
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: inset 2px 2px 6px #c3c8d3, inset -2px -2px 6px #ffffff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .info-item:hover {
+    transform: translateY(-2px);
+    box-shadow: inset 2px 2px 8px #b5bbc6, inset -2px -2px 8px #ffffff;
+  }
+  
+  /* Nội dung trong mỗi item */
+  .row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 15px;
+    color: #333;
+  }
+  
+  .row div:first-child {
+    font-weight: bold;
+    color: #555;
+  }
+  
+  /* Địa chỉ ví có thể sao chép */
+  #short-address {
+    cursor: pointer;
+    color: blue;
+    text-decoration: underline;
+    word-break: break-all;
+  }
+  
+  #copy-icon {
+    cursor: pointer;
+    color: #4CAF50;
+    margin-left: 8px;
+  }
+  
+  #copy-icon:hover {
+    color: #388E3C;
+  }
+  
+  /* Responsive: về 1 cột khi nhỏ */
+  @media (max-width: 600px) {
+    .info-container {
+      grid-template-columns: 1fr;
+    }
+  
+    .header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+  #tg-avatar {
+    border-radius: 50%;
+    height: 40px;
+    width: 40px;
+    object-fit: cover;
+  }
+  #short-address {
+    cursor: pointer;
+    color: #333;
+    text-decoration: none;
+    word-break: break-all;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/* Khi có lớp 'loading' sẽ xoay ngay tại nút Disconnect */
+#disconnect {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    background-color: #f44336;
+    color: white;
+    border-radius: 25px;
+    font-weight: bold;
+    font-size: 12px;
+    position: relative; /* Cần thiết để tạo hiệu ứng 'loading' */
+  }
+  
+  /* Thêm hiệu ứng spin cho nút Disconnect khi nó đang loading */
+  #disconnect.loading {
+    pointer-events: none; /* Ngừng click trong khi đang loading */
+    background-color: #d32f2f; /* Màu nền khi đang loading */
+  }
+  
+  #disconnect.loading:before {
+    content: "";
+    position: absolute;
+    border: 3px solid #fff;
+    border-top: 3px solid #4CAF50; /* Màu xoay */
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  
+  /* Định nghĩa hiệu ứng xoay */
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  /* Khi nhấn nút, thay đổi màu nền */
+  #disconnect:active {
+    background-color: #d32f2f;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+  /* Đảm bảo rằng margin và padding của body không ảnh hưởng đến footer */
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box; /* Đảm bảo các thuộc tính padding, margin được tính đúng */
+}
+
+/* Footer Style */
+footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: #1b1b1b;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 80px;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  margin: 0; /* Đảm bảo không có margin ảnh hưởng */
+  padding: 0; /* Đảm bảo không có padding ảnh hưởng */
+}
+
+.footer-item {
+  flex: 1;
+  text-align: center;
+  text-decoration: none;
+  color: #aaa;
+  font-size: 12px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.footer-item i {
+  font-size: 20px;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.footer-item:hover {
+  color: #00e0ff;
+}
+
+.footer-item.active {
+  color: #00e0ff;
+}
+
+.footer-item.active::after {
+  content: '';
+  display: none;
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  background-color: #00e0ff;
+  border-radius: 50%;
+}
+
+/* Home Nổi Bật */
+.footer-item.home {
+  position: relative;
+  top: -25px;
+  z-index: 101;
+}
+
+.footer-item.home .home-circle {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #00e0ff, #006eff);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(0, 224, 255, 0.4);
+  margin: 0 auto 5px auto;
+}
+
+.footer-item.home i {
+  font-size: 26px;
+  color: #fff;
+  margin: 0;
+}
+
+.footer-item.home span {
+  margin-top: 3px;
+  display: block;
+  color: #fff;
+  font-size: 12px;
+}
+

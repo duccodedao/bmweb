@@ -1,0 +1,268 @@
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', 'Roboto', sans-serif;
+      background: #e0e5ec;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      color: #333;
+      padding: 20px;
+      justify-content: center;
+    }
+
+    #connect-only {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    #disconnect-wallet {
+      margin-top: 20px;
+      display: none;
+      padding: 10px 20px;
+      background-color: #ff4c4c;
+      color: white;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+    }
+
+    h2 {
+      font-size: 22px;
+      margin-bottom: 20px;
+      color: #2e3a59;
+      text-align: center;
+    }
+
+    #jettons-list {
+      width: 100%;
+      max-width: 600px;    
+
+    }
+
+    .jetton-item {
+      display: flex;
+      align-items: center;
+      background: #e0e5ec;
+      padding: 16px;
+      border-radius: 14px;
+      margin-bottom: 14px;
+      box-shadow: inset 2px 2px 6px #c3c8d3, inset -2px -2px 6px #ffffff;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .jetton-item:hover {
+      transform: translateY(-2px);
+      box-shadow: inset 2px 2px 8px #b5bbc6, inset -2px -2px 8px #ffffff;
+    }
+
+    .jetton-logo {
+      width: 40px;
+      height: 40px;
+      margin-right: 16px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #ddd;
+      box-shadow: 2px 2px 4px #c3c8d3, -2px -2px 4px #ffffff;
+    }
+
+    .jetton-info {
+      display: flex;
+      flex-direction: column;
+      font-size: 15px;
+      color: #2f3d59;
+    }
+
+    .jetton-info strong {
+      font-weight: 700;
+      color: #004c99;
+    }
+
+    .jetton-info p {
+      font-size: 14px;
+      color: #00796b;
+      font-weight: 600;
+      margin: 4px 0 0;
+    }
+
+    .loader {
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #3498db;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 2s linear infinite;
+      margin: 20px auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 600px) {
+      .jetton-item {
+        padding: 14px;
+      }
+
+      .jetton-logo {
+        width: 36px;
+        height: 36px;
+      }
+
+      h2 {
+        font-size: 20px;
+      }
+
+      .jetton-info {
+        font-size: 14px;
+      }
+    }
+
+    #zero-balance-list {
+  width: 100%;
+  max-width: 600px;
+  margin-top: 10px;
+  margin-bottom: 85px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+#see-all-btn {
+  all: unset;
+  display: block;
+  text-align: center;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.5); /* Màu mờ */
+  margin-top: 12px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+#see-all-btn:hover {
+  color: rgba(0, 0, 0, 1); /* Hover rõ hơn một chút */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+
+
+
+
+.jetton-item {
+  position: relative;
+}
+
+.jetton-address-link {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  font-size: 14px;
+  color: #999;
+  text-decoration: none;
+  font-weight: bold;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.jetton-address-link:hover {
+  opacity: 1;
+  color: #666;
+}
+.verified-badge {
+    color: #1da1f2;
+    margin-left: 1px;
+    margin-bottom: 3px;
+    font-size: 20px;
+    vertical-align: middle;
+  }
+  .warning-badge {
+  color: #ffa500; /* Màu cam cảnh báo */
+  margin-left: 1px;
+  margin-bottom: 3px;
+  font-size: 20px;
+  vertical-align: middle;
+  filter: drop-shadow(0 0 1px rgba(255, 165, 0, 0.6));
+}
+
+
+
+
+
+  #disconnect-wallet {
+  display: none;
+  padding: 8px 14px;
+  background-color: #ff4c4c;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+
+
+
+
+
+#token-header {
+  display: none;
+}
+
+#see-all-btn {
+  display: none;
+}
+
+
+
+
+
+.jetton-info-popup {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  padding: 20px;
+}
+
+.jetton-info-popup-content {
+  background: white;
+  padding: 20px;
+  max-width: 500px;
+  margin: 200px auto;
+  border-radius: 20px;
+  position: relative;
+}
+
+.close-popup {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #f44336;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
+
