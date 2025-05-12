@@ -281,27 +281,36 @@
   </style>
 </head>
 <body>
-  <div id="connect-only">
-    <div id="connect-wallet"></div>
-  </div>
-  <div id="header-container" style="display:none; display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 600px; margin-bottom: 20px; margin-top: 65px;">
-    <h2 id="token-header" style="margin: 0;">Jettons</h2>
-    <button id="disconnect-wallet">Disconnect</button>
-  </div>
-  
-  <div id="loading-spinner" style="display:none;" class="loader"></div>
-  <div id="jettons-list"></div>
-  <div id="zero-balance-list" style="display: none;"></div>
-  <div id="see-all-btn">------- See all -------</div>
 
+
+<div id="connect-only">
+  <div id="connect-wallet"></div>
+</div>
+<div id="header-container" style="display:none; display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 600px; margin-bottom: 20px; margin-top: 65px;">
+ 
+  <h2 id="token-header" style="margin: 0;">Jettons</h2>
   
-  <div id="jetton-info-popup" class="jetton-info-popup">
-    <div class="jetton-info-popup-content">
-      <button id="close-popup" class="close-popup">X</button>
-      <h2>Thông tin chi tiết Jetton</h2>
-      <div id="jetton-info-container">Đang tải thông tin...</div>
-    </div>
+<!-- Thêm một div để hiển thị tổng số tiền USDT -->
+<div id="total-amount" style= "font-size: 18px; font-weight: bold;"></div>
+
+  <button id="disconnect-wallet">Disconnect</button>
+</div>
+
+
+<div id="loading-spinner" style="display:none;" class="loader"></div>
+<div id="jettons-list"></div>
+<div id="zero-balance-list" style="display: none;"></div>
+<div id="see-all-btn">------- See all -------</div>
+
+<div id="jetton-info-popup" class="jetton-info-popup">
+  <div class="jetton-info-popup-content">
+    <button id="close-popup" class="close-popup">X</button>
+    <h2>Thông tin chi tiết Jetton</h2>
+    <div id="jetton-info-container">Đang tải thông tin...</div>
   </div>
+</div>
+
+
   
 
 
