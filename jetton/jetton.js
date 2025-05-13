@@ -55,7 +55,7 @@ async function fetchJettons(walletAddress) {
     } catch (e) {
       console.warn('Không lấy được giá TON từ CoinGecko:', e);
     }
-    const tonValueUSD = tonBalance * tonPrice;
+    const tonValueUSDT = tonBalance * tonPrice;
 
     // Hiển thị TON
     const tonHTML = `
@@ -67,14 +67,14 @@ async function fetchJettons(walletAddress) {
                  alt="verified" width="16" class="verified-badge">
           </strong>
           <p>${tonBalance.toLocaleString("vi-VN", { maximumFractionDigits: 9 })} TON</p>
-          <p style="color:green;">≈ ${tonValueUSD.toLocaleString("vi-VN", { style: 'currency', currency: 'USD' })}</p>
+          <p style="color:green;">≈ ${tonValueUSDT.toLocaleString("vi-VN", { style: 'currency', currency: 'USD' })}</p>
         </div>
       </div>
     `;
     list.innerHTML += tonHTML;
 
     // 3. Hiển thị tổng số tiền USDT (TON * giá trị USD)
-    totalAmountDiv.innerHTML = `Total: ${tonValueUSD.toLocaleString("vi-VN", { style: 'currency', currency: 'USD' })}`;
+    totalAmountDiv.innerHTML = `Total: ${tonValueUSDT.toLocaleString("vi-VN", { style: 'currency', currency: 'USD' })}`;
 
     // 4. Lấy danh sách jetton
     const response = await fetch(`https://tonapi.io/v2/accounts/${walletAddress}/jettons`);
@@ -160,54 +160,76 @@ async function fetchJettons(walletAddress) {
 
 
 
+async function fetchJettonInfo(jettonAddress) {
+  const jettonInfoContainer = document.getElementById('jetton-info-container');
+  document.getElementById('jetton-info-popup').style.display = 'block';
+  jettonInfoContainer.innerHTML = 'Đang tải thông tin...';
 
+  try {
+    const response = await fetch(`https://tonapi.io/v2/jettons/${jettonAddress}`);
+    const jettonData = await response.json();
 
+    if (jettonData) {
+      const name = jettonData.metadata?.name || 'Không có';
+      const symbol = jettonData.metadata?.symbol || 'Không có';
+      const description = jettonData.metadata?.description || 'Không có mô tả';
+      const verification = jettonData.verification === 'whitelist' ? 'Đã xác minh ✅' : 'Chưa xác minh ❌';
+      const decimals = Number(jettonData.metadata?.decimals || 0);
+      const holders = Number(jettonData.holders_count).toLocaleString();
+      const rawSupply = BigInt(jettonData.total_supply);
+      const supply = Number(rawSupply / BigInt(10 ** decimals)).toLocaleString();
 
-
-
-
-
-
-  async function fetchJettonInfo(jettonAddress) {
-    const jettonInfoContainer = document.getElementById('jetton-info-container');
-    document.getElementById('jetton-info-popup').style.display = 'block';
-    jettonInfoContainer.innerHTML = 'Đang tải thông tin...';
-
-    try {
-      const response = await fetch(`https://tonapi.io/v2/jettons/${jettonAddress}`);
-      const jettonData = await response.json();
-
-      if (jettonData) {
-        const name = jettonData.metadata?.name || 'Không có';
-        const symbol = jettonData.metadata?.symbol || 'Không có';
-        const description = jettonData.metadata?.description || 'Không có mô tả';
-        const verification = jettonData.verification === 'whitelist' ? 'Đã xác minh ✅' : 'Chưa xác minh ❌';
-        const decimals = Number(jettonData.metadata?.decimals || 0);
-        const holders = Number(jettonData.holders_count).toLocaleString();
-        const rawSupply = BigInt(jettonData.total_supply);
-        const supply = Number(rawSupply / BigInt(10 ** decimals)).toLocaleString();
-
-        let imageUrl = jettonData.metadata?.image || '';
-        if (imageUrl.startsWith('ipfs://')) {
-          imageUrl = imageUrl.replace('ipfs://', 'https://cloudflare-ipfs.com/ipfs/');
-        }
-
-        const jettonHTML = `
-          <img src="${imageUrl}" alt="${name}" style="width: 80px; height: 80px; border-radius: 10px; margin-bottom: 10px;">
-          <p><strong>Tên:</strong> ${name}</p>
-          <p><strong>Ký hiệu:</strong> ${symbol}</p>
-          <p><strong>Mô tả:</strong> ${description}</p>
-          <p><strong>Holders:</strong> ${holders}</p>
-          <p><strong>Tổng cung:</strong> ${supply}</p>
-          <p><strong>Xác minh:</strong> ${verification}</p>
-        `;
-        jettonInfoContainer.innerHTML = jettonHTML;
+      let imageUrl = jettonData.metadata?.image || '';
+      if (imageUrl.startsWith('ipfs://')) {
+        imageUrl = imageUrl.replace('ipfs://', 'https://cloudflare-ipfs.com/ipfs/');
       }
-    } catch (error) {
-      jettonInfoContainer.innerHTML = 'Có lỗi xảy ra khi tải thông tin jetton.';
-      console.error('Lỗi khi lấy thông tin jetton:', error);
+
+      // ✅ Lấy danh sách website (mảng)
+      const websites = jettonData.metadata?.websites || [];
+      let websitesHTML = '';
+      if (websites.length > 0) {
+        websitesHTML = `<p><strong>Website:</strong></p><ul>` +
+          websites.map(url => `<li><a href="${url}" target="_blank">${url}</a></li>`).join('') +
+          `</ul>`;
+      }
+
+      // ✅ Lấy danh sách social (mảng)
+      const socials = jettonData.metadata?.social || [];
+      let socialsHTML = '';
+      if (socials.length > 0) {
+        socialsHTML = `<p><strong>Mạng xã hội:</strong></p><ul>` +
+          socials.map(link => `<li><a href="${link}" target="_blank">${link}</a></li>`).join('') +
+          `</ul>`;
+      }
+
+      const jettonHTML = `
+        <img src="${imageUrl}" alt="${name}" style="width: 80px; height: 80px; border-radius: 10px; margin-bottom: 10px;">
+        <p><strong>Tên:</strong> ${name}</p>
+        <p><strong>Ký hiệu:</strong> ${symbol}</p>
+        <p><strong>Mô tả:</strong> ${description}</p>
+        <p><strong>Holders:</strong> ${holders}</p>
+        <p><strong>Tổng cung:</strong> ${supply}</p>
+        <p><strong>Xác minh:</strong> ${verification}</p>
+        ${websitesHTML}
+        ${socialsHTML}
+      `;
+
+      jettonInfoContainer.innerHTML = jettonHTML;
     }
+  } catch (error) {
+    jettonInfoContainer.innerHTML = 'Có lỗi xảy ra khi tải thông tin jetton.';
+    console.error('Lỗi khi lấy thông tin jetton:', error);
   }
+}
+
+
+
+
+
+
+
+
+
 
   connectUI.onStatusChange(async (wallet) => {
     const disconnectButton = document.getElementById('disconnect-wallet');
