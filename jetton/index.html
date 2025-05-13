@@ -290,6 +290,14 @@
  
   <h2 id="token-header" style="margin: 0;">Jettons</h2>
   
+
+
+
+
+
+
+
+
 <!-- Thêm một div để hiển thị tổng số tiền USDT -->
 <div id="total-amount" style= "font-size: 18px; font-weight: bold;"></div>
 
@@ -301,14 +309,13 @@
 <div id="jettons-list"></div>
 <div id="zero-balance-list" style="display: none;"></div>
 <div id="see-all-btn">------- See all -------</div>
-
 <div id="jetton-info-popup" class="jetton-info-popup">
   <div class="jetton-info-popup-content">
-    <button id="close-popup" class="close-popup">X</button>
-    <h2>Thông tin chi tiết Jetton</h2>
-    <div id="jetton-info-container">Đang tải thông tin...</div>
+    <button class="close-popup" onclick="document.getElementById('jetton-info-popup').style.display='none'">×</button>
+    <div id="jetton-info-container"></div>
   </div>
 </div>
+
 
 
   
