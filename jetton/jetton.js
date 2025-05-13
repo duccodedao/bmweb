@@ -230,41 +230,39 @@ async function fetchJettonInfo(jettonAddress) {
 
 
 
+connectUI.onStatusChange(async (wallet) => {
+  const disconnectButton = document.getElementById('disconnect-wallet');
+  const connectOnlyDiv = document.getElementById('connect-only');
+  const tokenHeader = document.getElementById('token-header');
+  const seeAllBtn = document.getElementById('see-all-btn');
+  const totalAmountDiv = document.getElementById('total-amount'); // Thêm dòng này
 
-  connectUI.onStatusChange(async (wallet) => {
-    const disconnectButton = document.getElementById('disconnect-wallet');
-    const connectOnlyDiv = document.getElementById('connect-only');
-    const tokenHeader = document.getElementById('token-header');
-    const seeAllBtn = document.getElementById('see-all-btn');
+  if (wallet && wallet.account) {
+    connectOnlyDiv.style.display = 'none';
+    disconnectButton.style.display = 'block';
+    tokenHeader.style.display = 'block';
+    seeAllBtn.style.display = 'block';
+    totalAmountDiv.style.display = 'block'; // Hiện lên khi đã kết nối
 
-    if (wallet && wallet.account) {
-      connectOnlyDiv.style.display = 'none';
-      disconnectButton.style.display = 'block';
-      tokenHeader.style.display = 'block';
-      seeAllBtn.style.display = 'block';
+    await fetchJettons(wallet.account.address);
 
-      await fetchJettons(wallet.account.address);
-
-      disconnectButton.addEventListener('click', () => {
-        connectUI.disconnect();
-        connectOnlyDiv.style.display = 'flex';
-        disconnectButton.style.display = 'none';
-        tokenHeader.style.display = 'none';
-        seeAllBtn.style.display = 'none';
-        document.getElementById('jettons-list').innerHTML = '';
-        document.getElementById('zero-balance-list').innerHTML = '';
-      });
-    } else {
+    disconnectButton.addEventListener('click', () => {
+      connectUI.disconnect();
       connectOnlyDiv.style.display = 'flex';
       disconnectButton.style.display = 'none';
       tokenHeader.style.display = 'none';
       seeAllBtn.style.display = 'none';
+      totalAmountDiv.style.display = 'none'; // Ẩn khi ngắt kết nối
       document.getElementById('jettons-list').innerHTML = '';
       document.getElementById('zero-balance-list').innerHTML = '';
-    }
-  });
-
-  document.getElementById('close-popup').addEventListener('click', () => {
-    document.getElementById('jetton-info-popup').style.display = 'none';
-  });
-
+    });
+  } else {
+    connectOnlyDiv.style.display = 'flex';
+    disconnectButton.style.display = 'none';
+    tokenHeader.style.display = 'none';
+    seeAllBtn.style.display = 'none';
+    totalAmountDiv.style.display = 'none'; // Ẩn khi chưa kết nối
+    document.getElementById('jettons-list').innerHTML = '';
+    document.getElementById('zero-balance-list').innerHTML = '';
+  }
+});
