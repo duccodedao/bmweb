@@ -192,17 +192,19 @@ Not verified
           `</ul>`;
       }
 
-      const jettonHTML = `
-        <img src="${imageUrl}" alt="${name}" style="width: 80px; height: 80px; border-radius: 10px; margin-bottom: 10px;">
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Symbol:</strong> ${symbol}</p>
-        <p><strong>Description:</strong> ${description}</p>
-        <p><strong>Holders:</strong> ${holders}</p>
-        <p><strong>Supply:</strong> ${supply}</p>
-        <p><strong>Status:</strong> ${verification}</p>
-        ${websitesHTML}
-        ${socialsHTML}
-      `;
+const jettonHTML = `
+  <img src="${imageUrl}" alt="${name}" style="width: 80px; height: 80px; border-radius: 10px; margin-bottom: 10px;">
+  <p><strong>Name:</strong> ${name}</p>
+  <p><strong>Symbol:</strong> ${symbol}</p>
+  <p><strong>Address:</strong> <a href="https://tonviewer.com/${jettonAddress}" target="_blank">Tonviewer</a></p>
+  <p><strong>Description:</strong> ${description}</p>
+  <p><strong>Holders:</strong> ${holders}</p>
+  <p><strong>Supply:</strong> ${supply}</p>
+  <p><strong>Status:</strong> ${verification}</p>
+  ${websitesHTML}
+  ${socialsHTML}
+`;
+
 
       jettonInfoContainer.innerHTML = jettonHTML;
     }
