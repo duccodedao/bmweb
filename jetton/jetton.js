@@ -1,30 +1,22 @@
+// Tự động active tab đang mở
+const currentPage = location.pathname.split("/").pop();
+const items = document.querySelectorAll(".footer-item");
+items.forEach(item => {
+  const page = item.getAttribute("data-page");
+  if (page === currentPage) {
+    item.classList.add("active");
+  }
+});
 
-  // Tự động active tab đang mở
-  const currentPage = location.pathname.split("/").pop();
-  const items = document.querySelectorAll(".footer-item");
-  items.forEach(item => {
-    const page = item.getAttribute("data-page");
-    if (page === currentPage) {
-      item.classList.add("active");
-    }
-  });
+const tg = Telegram.WebApp;
+tg.ready();
+tg.BackButton.show();
+tg.BackButton.onClick(() => window.history.back());
 
-  const tg = Telegram.WebApp;
-  tg.ready();
-  tg.BackButton.show();
-  tg.BackButton.onClick(() => window.history.back());
-
-  const connectUI = new TON_CONNECT_UI.TonConnectUI({
-    manifestUrl: 'https://bmweb.site/tonconnect-manifest.json',
-    buttonRootId: 'connect-wallet'
-  });
-
-
-
-
-
-
-
+const connectUI = new TON_CONNECT_UI.TonConnectUI({
+  manifestUrl: 'https://bmweb.site/tonconnect-manifest.json',
+  buttonRootId: 'connect-wallet'
+});
 
 async function fetchJettons(walletAddress) {
   const loadingSpinner = document.getElementById('loading-spinner');
@@ -32,7 +24,7 @@ async function fetchJettons(walletAddress) {
   const zeroList = document.getElementById('zero-balance-list');
   const seeAllBtn = document.getElementById('see-all-btn');
   const tokenHeader = document.getElementById('token-header');
-  const totalAmountDiv = document.getElementById('total-amount'); // Phần tử hiển thị tổng số tiền
+  const totalAmountDiv = document.getElementById('total-amount');
 
   loadingSpinner.style.display = 'block';
   list.innerHTML = '';
@@ -46,35 +38,23 @@ async function fetchJettons(walletAddress) {
     const tonData = await tonRes.json();
     const tonBalance = parseFloat(tonData.balance) / 1e9;
 
-    // 2. Lấy giá TON theo USD từ CoinGecko
-    let tonPrice = 0;
-    try {
-      const priceRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=the-open-network&vs_currencies=usd');
-      const priceData = await priceRes.json();
-      tonPrice = priceData['the-open-network']?.usd || 0;
-    } catch (e) {
-      console.warn('Không lấy được giá TON từ CoinGecko:', e);
-    }
-    const tonValueUSDT = tonBalance * tonPrice;
-
-    // Hiển thị TON
+    // Hiển thị TON (chỉ số lượng, không có giá USD)
     const tonHTML = `
       <div class="jetton-item">
         <img src="/logo-coin/ton.jpg" alt="TON" class="jetton-logo">
         <div class="jetton-info">
-          <strong>TON 
+          <strong>TON
             <img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg" 
                  alt="verified" width="16" class="verified-badge">
           </strong>
           <p>${tonBalance.toLocaleString("vi-VN", { maximumFractionDigits: 9 })} TON</p>
-          <p style="color:green;">≈ ${tonValueUSDT.toLocaleString("vi-VN", { style: 'currency', currency: 'USD' })}</p>
         </div>
       </div>
     `;
     list.innerHTML += tonHTML;
 
-    // 3. Hiển thị tổng số tiền USDT (TON * giá trị USD)
-    totalAmountDiv.innerHTML = `Total: ${tonValueUSDT.toLocaleString("vi-VN", { style: 'currency', currency: 'USD' })}`;
+    // Ẩn tổng số tiền vì không có giá USD
+    totalAmountDiv.innerHTML = '';
 
     // 4. Lấy danh sách jetton
     const response = await fetch(`https://tonapi.io/v2/accounts/${walletAddress}/jettons`);
@@ -112,16 +92,7 @@ async function fetchJettons(walletAddress) {
         ? '<img src="https://cdn-icons-png.flaticon.com/512/1828/1828843.png" alt="warning" width="16" title="Token chưa xác minh hoặc đáng nghi" class="warning-badge">'
         : '';
 
-      // 5. Lấy giá jetton theo USD từ CoinGecko
-      let price = 0;
-      try {
-        const priceRes = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${symbol.toLowerCase()}&vs_currencies=usd`);
-        const priceData = await priceRes.json();
-        price = priceData[symbol.toLowerCase()]?.usd || 0;
-      } catch (e) {
-        console.warn(`Không tìm thấy giá cho ${symbol} từ CoinGecko:`, e);
-      }
-      const valueUSD = balance * price;
+      // Bỏ phần lấy giá và tính giá trị USD
 
       const itemHTML = `
         <div class="jetton-item" onclick="fetchJettonInfo('${jettonAddress}')">
@@ -129,7 +100,6 @@ async function fetchJettons(walletAddress) {
           <div class="jetton-info">
             <strong>${name} ${verifiedBadge} ${warningIcon}</strong>
             <p>${formattedBalance} ${symbol}</p>
-            <p style="color:green;">≈ ${valueUSD.toLocaleString("vi-VN", { style: 'currency', currency: 'USD' })}</p>
           </div>
           <a href="https://tonviewer.com/${walletAddress}/jetton/${jettonAddress}" class="jetton-address-link" target="_blank">View</a>
         </div>
@@ -153,17 +123,27 @@ async function fetchJettons(walletAddress) {
 
   } catch (error) {
     loadingSpinner.style.display = 'none';
-    console.error('Lỗi khi lấy jettons:', error);
+    console.error('ERROR', error);
   }
 }
 
-
-
+// Hàm fetchJettonInfo không thay đổi, giữ nguyên như cũ
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 async function fetchJettonInfo(jettonAddress) {
   const jettonInfoContainer = document.getElementById('jetton-info-container');
   document.getElementById('jetton-info-popup').style.display = 'block';
-  jettonInfoContainer.innerHTML = 'Đang tải thông tin...';
+
+  // Hiển thị spinner loading
+jettonInfoContainer.innerHTML = `
+  <div class="spinner"></div>
+  <p style="text-align: center; margin-top: 10px;">Loading information...</p>
+`;
+  // Tạo delay giả 1.5 giây
+  await delay(1500);
+
 
   try {
     const response = await fetch(`https://tonapi.io/v2/jettons/${jettonAddress}`);
@@ -173,7 +153,19 @@ async function fetchJettonInfo(jettonAddress) {
       const name = jettonData.metadata?.name || 'Không có';
       const symbol = jettonData.metadata?.symbol || 'Không có';
       const description = jettonData.metadata?.description || 'Không có mô tả';
-      const verification = jettonData.verification === 'whitelist' ? 'Đã xác minh ✅' : 'Chưa xác minh ❌';
+const verification = jettonData.verification === 'whitelist'
+  ? `<span style="color: #1877F2; font-weight: bold;">
+      Verified
+      <img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg" 
+           alt="verified" width="16" style="vertical-align: middle; margin-bottom: 3px;">
+    </span>`
+  : `<span style="color: red; font-weight: bold;">
+Not verified
+      <img src="https://cdn-icons-png.flaticon.com/512/1828/1828843.png" 
+           alt="warning" width="16" style="vertical-align: middle;  margin-bottom: 3px;">
+    </span>`;
+
+
       const decimals = Number(jettonData.metadata?.decimals || 0);
       const holders = Number(jettonData.holders_count).toLocaleString();
       const rawSupply = BigInt(jettonData.total_supply);
@@ -184,7 +176,6 @@ async function fetchJettonInfo(jettonAddress) {
         imageUrl = imageUrl.replace('ipfs://', 'https://cloudflare-ipfs.com/ipfs/');
       }
 
-      // ✅ Lấy danh sách website (mảng)
       const websites = jettonData.metadata?.websites || [];
       let websitesHTML = '';
       if (websites.length > 0) {
@@ -193,7 +184,6 @@ async function fetchJettonInfo(jettonAddress) {
           `</ul>`;
       }
 
-      // ✅ Lấy danh sách social (mảng)
       const socials = jettonData.metadata?.social || [];
       let socialsHTML = '';
       if (socials.length > 0) {
@@ -204,12 +194,12 @@ async function fetchJettonInfo(jettonAddress) {
 
       const jettonHTML = `
         <img src="${imageUrl}" alt="${name}" style="width: 80px; height: 80px; border-radius: 10px; margin-bottom: 10px;">
-        <p><strong>Tên:</strong> ${name}</p>
-        <p><strong>Ký hiệu:</strong> ${symbol}</p>
-        <p><strong>Mô tả:</strong> ${description}</p>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Symbol:</strong> ${symbol}</p>
+        <p><strong>Description:</strong> ${description}</p>
         <p><strong>Holders:</strong> ${holders}</p>
-        <p><strong>Tổng cung:</strong> ${supply}</p>
-        <p><strong>Xác minh:</strong> ${verification}</p>
+        <p><strong>Supply:</strong> ${supply}</p>
+        <p><strong>Status:</strong> ${verification}</p>
         ${websitesHTML}
         ${socialsHTML}
       `;
@@ -217,32 +207,24 @@ async function fetchJettonInfo(jettonAddress) {
       jettonInfoContainer.innerHTML = jettonHTML;
     }
   } catch (error) {
-    jettonInfoContainer.innerHTML = 'Có lỗi xảy ra khi tải thông tin jetton.';
-    console.error('Lỗi khi lấy thông tin jetton:', error);
+    jettonInfoContainer.innerHTML = 'ERROR';
+    console.error('ERROR', error);
   }
 }
-
-
-
-
-
-
-
-
 
 connectUI.onStatusChange(async (wallet) => {
   const disconnectButton = document.getElementById('disconnect-wallet');
   const connectOnlyDiv = document.getElementById('connect-only');
   const tokenHeader = document.getElementById('token-header');
   const seeAllBtn = document.getElementById('see-all-btn');
-  const totalAmountDiv = document.getElementById('total-amount'); // Thêm dòng này
+  const totalAmountDiv = document.getElementById('total-amount');
 
   if (wallet && wallet.account) {
     connectOnlyDiv.style.display = 'none';
     disconnectButton.style.display = 'block';
     tokenHeader.style.display = 'block';
     seeAllBtn.style.display = 'block';
-    totalAmountDiv.style.display = 'block'; // Hiện lên khi đã kết nối
+    totalAmountDiv.style.display = 'none'; // Ẩn đi vì không còn hiển thị giá
 
     await fetchJettons(wallet.account.address);
 
@@ -252,7 +234,7 @@ connectUI.onStatusChange(async (wallet) => {
       disconnectButton.style.display = 'none';
       tokenHeader.style.display = 'none';
       seeAllBtn.style.display = 'none';
-      totalAmountDiv.style.display = 'none'; // Ẩn khi ngắt kết nối
+      totalAmountDiv.style.display = 'none';
       document.getElementById('jettons-list').innerHTML = '';
       document.getElementById('zero-balance-list').innerHTML = '';
     });
@@ -261,7 +243,7 @@ connectUI.onStatusChange(async (wallet) => {
     disconnectButton.style.display = 'none';
     tokenHeader.style.display = 'none';
     seeAllBtn.style.display = 'none';
-    totalAmountDiv.style.display = 'none'; // Ẩn khi chưa kết nối
+    totalAmountDiv.style.display = 'none';
     document.getElementById('jettons-list').innerHTML = '';
     document.getElementById('zero-balance-list').innerHTML = '';
   }
