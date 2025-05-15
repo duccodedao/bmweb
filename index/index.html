@@ -12,7 +12,7 @@
 
 </head>
 <style>
-  
+
     * {
       margin: 0;
       padding: 0;
@@ -45,17 +45,18 @@
 
 
 
-    body {
-      font-family: 'Segoe UI', 'Roboto', sans-serif;
-      background: #e0e5ec;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      color: #333;
-      padding: 20px;
-      justify-content: center;
-    }
+body {
+  font-family: 'Segoe UI', 'Roboto', sans-serif;
+  background: #e0e5ec;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  color: #333;
+  padding: 20px;
+  justify-content: flex-start;  /* ✅ sửa ở đây */
+}
+
 
     #connect-only {
       display: flex;
@@ -422,42 +423,47 @@
 }
 
 
-/* Header người dùng: chỉ avatar và username */
+
+
+
+
+
+
+
+
 #user-header {
   display: flex;
   align-items: center;
   justify-content: flex-start;
   gap: 12px;
   padding: 10px 16px;
-  margin-top: 12px;
+  margin-top: 10px; /* Cách top 90px */
 }
 
-/* Avatar hình tròn với hiệu ứng viền */
-#user-avatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #ccc;
-  transition: border-color 0.3s ease;
-}
 
-#user-avatar:hover {
-  border-color: #007aff;
-}
+  #user-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ccc;
+    transition: border-color 0.3s ease;
+  }
 
-/* Username hiển thị đẹp */
-#user-username {
-  font-size: 16px;
-  font-weight: 600;
-  color: #222;
-  transition: color 0.3s ease;
-}
+  #user-avatar:hover {
+    border-color: #007aff;
+  }
 
-#user-username:hover {
-  color: #007aff;
-}
+  #user-username {
+    font-size: 16px;
+    font-weight: 600;
+    color: #222;
+    transition: color 0.3s ease;
+  }
 
+  #user-username:hover {
+    color: #007aff;
+  }
 </style>
 <body>
   <!-- Header người dùng (avatar + username) -->
