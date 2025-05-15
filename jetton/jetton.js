@@ -18,6 +18,11 @@ const connectUI = new TON_CONNECT_UI.TonConnectUI({
   buttonRootId: 'connect-wallet'
 });
 
+
+
+
+
+
 async function fetchJettons(walletAddress) {
   const loadingSpinner = document.getElementById('loading-spinner');
   const list = document.getElementById('jettons-list');
@@ -38,7 +43,14 @@ async function fetchJettons(walletAddress) {
     const tonData = await tonRes.json();
     const tonBalance = parseFloat(tonData.balance) / 1e9;
 
-    // Hiển thị TON (chỉ số lượng, không có giá USD)
+    // 2. Lấy giá TON từ OKX
+    const okxRes = await fetch('https://www.okx.com/api/v5/market/ticker?instId=TON-USDT');
+    const okxData = await okxRes.json();
+    const tonPrice = parseFloat(okxData.data[0].last);
+    const tonOpen = parseFloat(okxData.data[0].open24h);
+    const tonChange = ((tonPrice - tonOpen) / tonOpen) * 100;
+
+    // 3. Hiển thị TON với giá và thay đổi %
     const tonHTML = `
       <div class="jetton-item">
         <img src="/logo-coin/ton.jpg" alt="TON" class="jetton-logo">
@@ -48,13 +60,16 @@ async function fetchJettons(walletAddress) {
                  alt="verified" width="16" class="verified-badge">
           </strong>
           <p>${tonBalance.toLocaleString("vi-VN", { maximumFractionDigits: 9 })} TON</p>
+          <p style="color: ${tonChange >= 0 ? 'green' : 'red'};">
+            $${tonPrice.toFixed(3)} (${tonChange.toFixed(2)}%)
+          </p>
         </div>
       </div>
     `;
     list.innerHTML += tonHTML;
 
-    // Ẩn tổng số tiền vì không có giá USD
-    totalAmountDiv.innerHTML = '';
+    // Nếu muốn hiển thị tổng giá trị USD ví:
+    totalAmountDiv.innerHTML = `<p>Tổng trị giá: $${(tonBalance * tonPrice).toFixed(2)}</p>`;
 
     // 4. Lấy danh sách jetton
     const response = await fetch(`https://tonapi.io/v2/accounts/${walletAddress}/jettons`);
@@ -69,7 +84,6 @@ async function fetchJettons(walletAddress) {
 
     const zeroBalanceJettons = [];
 
-    // Dùng for...of để await bên trong
     for (const jetton of data.balances) {
       const decimals = jetton.jetton.decimals || 9;
       const balance = parseFloat(jetton.balance) / (10 ** decimals);
@@ -91,8 +105,6 @@ async function fetchJettons(walletAddress) {
       const warningIcon = isSuspicious
         ? '<img src="https://cdn-icons-png.flaticon.com/512/1828/1828843.png" alt="warning" width="16" title="Token chưa xác minh hoặc đáng nghi" class="warning-badge">'
         : '';
-
-      // Bỏ phần lấy giá và tính giá trị USD
 
       const itemHTML = `
         <div class="jetton-item" onclick="fetchJettonInfo('${jettonAddress}')">
@@ -126,6 +138,16 @@ async function fetchJettons(walletAddress) {
     console.error('ERROR', error);
   }
 }
+
+
+
+
+
+
+
+
+
+
 
 // Hàm fetchJettonInfo không thay đổi, giữ nguyên như cũ
 function delay(ms) {
