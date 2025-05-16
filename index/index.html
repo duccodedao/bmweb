@@ -507,7 +507,7 @@ body {
 
 
 <script>
-  // Tự động active tab đang mở
+ // Tự động active tab đang mở
 const currentPage = location.pathname.split("/").pop();
 const items = document.querySelectorAll(".footer-item");
 items.forEach(item => {
@@ -534,6 +534,7 @@ async function fetchJettons(walletAddress) {
   const seeAllBtn = document.getElementById('see-all-btn');
   const tokenHeader = document.getElementById('token-header');
   const totalAmountDiv = document.getElementById('total-amount');
+  const userNameDiv = document.getElementById('user-name');
 
   loadingSpinner.style.display = 'block';
   list.innerHTML = '';
@@ -542,12 +543,21 @@ async function fetchJettons(walletAddress) {
   seeAllBtn.style.display = 'none';
 
   try {
-    // 1. Lấy số dư TON Coin
     const tonRes = await fetch(`https://tonapi.io/v2/accounts/${walletAddress}`);
     const tonData = await tonRes.json();
     const tonBalance = parseFloat(tonData.balance) / 1e9;
 
-    // Hiển thị TON (chỉ số lượng, không có giá USD)
+    const userName = tonData.name;
+    if (userName && userNameDiv) {
+      userNameDiv.innerHTML = `<p><strong>👤 ${userName}</strong></p>`;
+    }
+
+    const okxRes = await fetch('https://www.okx.com/api/v5/market/ticker?instId=TON-USDT');
+    const okxData = await okxRes.json();
+    const tonPrice = parseFloat(okxData.data[0].last);
+    const tonOpen = parseFloat(okxData.data[0].open24h);
+    const tonChange = ((tonPrice - tonOpen) / tonOpen) * 100;
+
     const tonHTML = `
       <div class="jetton-item">
         <img src="/logo-coin/ton.jpg" alt="TON" class="jetton-logo">
@@ -557,15 +567,15 @@ async function fetchJettons(walletAddress) {
                  alt="verified" width="16" class="verified-badge">
           </strong>
           <p>${tonBalance.toLocaleString("vi-VN", { maximumFractionDigits: 9 })} TON</p>
+          <p style="color: ${tonChange >= 0 ? 'green' : 'red'};">
+            $${tonPrice.toFixed(3)} (${tonChange.toFixed(2)}%)
+          </p>
         </div>
       </div>
     `;
     list.innerHTML += tonHTML;
+    totalAmountDiv.innerHTML = `<p>Tổng trị giá: $${(tonBalance * tonPrice).toFixed(2)}</p>`;
 
-    // Ẩn tổng số tiền vì không có giá USD
-    totalAmountDiv.innerHTML = '';
-
-    // 4. Lấy danh sách jetton
     const response = await fetch(`https://tonapi.io/v2/accounts/${walletAddress}/jettons`);
     const data = await response.json();
     loadingSpinner.style.display = 'none';
@@ -578,7 +588,6 @@ async function fetchJettons(walletAddress) {
 
     const zeroBalanceJettons = [];
 
-    // Dùng for...of để await bên trong
     for (const jetton of data.balances) {
       const decimals = jetton.jetton.decimals || 9;
       const balance = parseFloat(jetton.balance) / (10 ** decimals);
@@ -592,16 +601,13 @@ async function fetchJettons(walletAddress) {
       const image = jetton.jetton.image || 'https://duccodedao.github.io/web/logo-coin/bmlogo.jpg';
       const jettonAddress = jetton.jetton.address;
       const isVerified = jetton.jetton.verification === "whitelist";
-      const verifiedBadge = isVerified
-        ? '<img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg" alt="verified" width="16" class="verified-badge">'
+      const verifiedBadge = isVerified ?
+        '<img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg" alt="verified" width="16" class="verified-badge">'
         : '';
-
       const isSuspicious = !isVerified || image.includes("placeholder");
-      const warningIcon = isSuspicious
-        ? '<img src="https://cdn-icons-png.flaticon.com/512/1828/1828843.png" alt="warning" width="16" title="Token chưa xác minh hoặc đáng nghi" class="warning-badge">'
+      const warningIcon = isSuspicious ?
+        '<img src="https://cdn-icons-png.flaticon.com/512/1828/1828843.png" alt="warning" width="16" title="Token chưa xác minh hoặc đáng nghi" class="warning-badge">'
         : '';
-
-      // Bỏ phần lấy giá và tính giá trị USD
 
       const itemHTML = `
         <div class="jetton-item" onclick="fetchJettonInfo('${jettonAddress}')">
@@ -636,7 +642,8 @@ async function fetchJettons(walletAddress) {
   }
 }
 
-// Hàm fetchJettonInfo không thay đổi, giữ nguyên như cũ
+// Các function khác giữ nguyên
+
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -645,14 +652,12 @@ async function fetchJettonInfo(jettonAddress) {
   const jettonInfoContainer = document.getElementById('jetton-info-container');
   document.getElementById('jetton-info-popup').style.display = 'block';
 
-  // Hiển thị spinner loading
-jettonInfoContainer.innerHTML = `
-  <div class="spinner"></div>
-  <p style="text-align: center; margin-top: 10px;">Loading information...</p>
-`;
-  // Tạo delay giả 1.5 giây
-  await delay(1500);
+  jettonInfoContainer.innerHTML = `
+    <div class="spinner"></div>
+    <p style="text-align: center; margin-top: 10px;">Loading information...</p>
+  `;
 
+  await delay(1500);
 
   try {
     const response = await fetch(`https://tonapi.io/v2/jettons/${jettonAddress}`);
@@ -662,18 +667,9 @@ jettonInfoContainer.innerHTML = `
       const name = jettonData.metadata?.name || 'Không có';
       const symbol = jettonData.metadata?.symbol || 'Không có';
       const description = jettonData.metadata?.description || 'Không có mô tả';
-const verification = jettonData.verification === 'whitelist'
-  ? `<span style="color: #1877F2; font-weight: bold;">
-      Verified
-      <img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg" 
-           alt="verified" width="16" style="vertical-align: middle; margin-bottom: 3px;">
-    </span>`
-  : `<span style="color: red; font-weight: bold;">
-Not verified
-      <img src="https://cdn-icons-png.flaticon.com/512/1828/1828843.png" 
-           alt="warning" width="16" style="vertical-align: middle;  margin-bottom: 3px;">
-    </span>`;
-
+      const verification = jettonData.verification === 'whitelist'
+        ? `<span style="color: #1877F2; font-weight: bold;">Verified <img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg" alt="verified" width="16" style="vertical-align: middle; margin-bottom: 3px;"></span>`
+        : `<span style="color: red; font-weight: bold;">Not verified <img src="https://cdn-icons-png.flaticon.com/512/1828/1828843.png" alt="warning" width="16" style="vertical-align: middle;  margin-bottom: 3px;"></span>`;
 
       const decimals = Number(jettonData.metadata?.decimals || 0);
       const holders = Number(jettonData.holders_count).toLocaleString();
@@ -701,19 +697,18 @@ Not verified
           `</ul>`;
       }
 
-const jettonHTML = `
-  <img src="${imageUrl}" alt="${name}" style="width: 80px; height: 80px; border-radius: 10px; margin-bottom: 10px;">
-  <p><strong>Name:</strong> ${name}</p>
-  <p><strong>Symbol:</strong> ${symbol}</p>
-  <p><strong>Address:</strong> <a href="https://tonviewer.com/${jettonAddress}" target="_blank">Tonviewer</a></p>
-  <p><strong>Description:</strong> ${description}</p>
-  <p><strong>Holders:</strong> ${holders}</p>
-  <p><strong>Supply:</strong> ${supply}</p>
-  <p><strong>Status:</strong> ${verification}</p>
-  ${websitesHTML}
-  ${socialsHTML}
-`;
-
+      const jettonHTML = `
+        <img src="${imageUrl}" alt="${name}" style="width: 80px; height: 80px; border-radius: 10px; margin-bottom: 10px;">
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Symbol:</strong> ${symbol}</p>
+        <p><strong>Address:</strong> <a href="https://tonviewer.com/${jettonAddress}" target="_blank">Tonviewer</a></p>
+        <p><strong>Description:</strong> ${description}</p>
+        <p><strong>Holders:</strong> ${holders}</p>
+        <p><strong>Supply:</strong> ${supply}</p>
+        <p><strong>Status:</strong> ${verification}</p>
+        ${websitesHTML}
+        ${socialsHTML}
+      `;
 
       jettonInfoContainer.innerHTML = jettonHTML;
     }
@@ -735,7 +730,7 @@ connectUI.onStatusChange(async (wallet) => {
     disconnectButton.style.display = 'block';
     tokenHeader.style.display = 'block';
     seeAllBtn.style.display = 'block';
-    totalAmountDiv.style.display = 'none'; // Ẩn đi vì không còn hiển thị giá
+    totalAmountDiv.style.display = 'none';
 
     await fetchJettons(wallet.account.address);
 
@@ -748,6 +743,7 @@ connectUI.onStatusChange(async (wallet) => {
       totalAmountDiv.style.display = 'none';
       document.getElementById('jettons-list').innerHTML = '';
       document.getElementById('zero-balance-list').innerHTML = '';
+      document.getElementById('user-name').innerHTML = '';
     });
   } else {
     connectOnlyDiv.style.display = 'flex';
@@ -757,14 +753,9 @@ connectUI.onStatusChange(async (wallet) => {
     totalAmountDiv.style.display = 'none';
     document.getElementById('jettons-list').innerHTML = '';
     document.getElementById('zero-balance-list').innerHTML = '';
+    document.getElementById('user-name').innerHTML = '';
   }
 });
-
-
-
-const tgUser = Telegram.WebApp.initDataUnsafe.user;
-document.getElementById('user-avatar').src = tgUser.photo_url;
-document.getElementById('user-username').textContent = tgUser.username || tgUser.first_name;
 
 </script>
 </body>
