@@ -43,29 +43,28 @@ async function fetchJettons(walletAddress) {
     const tonData = await tonRes.json();
     const tonBalance = parseFloat(tonData.balance) / 1e9;
 
-    // 2. Lấy giá TON từ OKX
-    const okxRes = await fetch('https://www.okx.com/api/v5/market/ticker?instId=TON-USDT');
-    const okxData = await okxRes.json();
-    const tonPrice = parseFloat(okxData.data[0].last);
-    const tonOpen = parseFloat(okxData.data[0].open24h);
-    const tonChange = ((tonPrice - tonOpen) / tonOpen) * 100;
+const okxRes = await fetch('https://www.okx.com/api/v5/market/ticker?instId=TON-USDT');
+const okxData = await okxRes.json();
+const tonPrice = parseFloat(okxData.data[0].last);
+const tonOpen = parseFloat(okxData.data[0].open24h);
+const tonChange = ((tonPrice - tonOpen) / tonOpen) * 100;
+const changeSign = tonChange >= 0 ? '+' : '';
 
-    // 3. Hiển thị TON với giá và thay đổi %
-    const tonHTML = `
-      <div class="jetton-item">
-        <img src="/logo-coin/ton.jpg" alt="TON" class="jetton-logo">
-        <div class="jetton-info">
-          <strong>TON
-            <img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg" 
-                 alt="verified" width="16" class="verified-badge">
-          </strong>
-          <p>${tonBalance.toLocaleString("vi-VN", { maximumFractionDigits: 9 })} TON</p>
-          <p style="color: ${tonChange >= 0 ? 'green' : 'red'};">
-            $${tonPrice.toFixed(3)} (${tonChange.toFixed(2)}%)
-          </p>
-        </div>
-      </div>
-    `;
+const tonHTML = `
+  <div class="jetton-item">
+    <img src="/logo-coin/ton.jpg" alt="TON" class="jetton-logo">
+    <div class="jetton-info">
+      <strong>TON
+        <img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg" 
+             alt="verified" width="16" class="verified-badge">
+      </strong>
+      <p>${tonBalance.toLocaleString("vi-VN", { maximumFractionDigits: 9 })} TON</p>
+      <p style="color: ${tonChange >= 0 ? 'green' : 'red'};">
+        $${tonPrice.toFixed(3)} (${changeSign}${tonChange.toFixed(2)}%)
+      </p>
+    </div>
+  </div>
+`;
     list.innerHTML += tonHTML;
 
     // Nếu muốn hiển thị tổng giá trị USD ví:
