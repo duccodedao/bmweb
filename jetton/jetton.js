@@ -211,7 +211,13 @@ for (const jetton of data.balances) {
     : '';
 
   // Lấy giá USDT nếu có trong price.prices.USDT
-  const priceUSDT = jetton.price?.prices?.USDT || 0;
+ let priceUSDT = jetton.price?.prices?.USDT || 0;
+
+// Nếu là địa chỉ đặc biệt, gán giá thủ công
+if (jetton.jetton.address === '0:18326f7ba223e01d69238f38b419109ce7074104d79bbfbad48b3eff5228396b') {
+  priceUSDT = 0.0001;
+}
+
 
   // Lấy % biến động 24h trong price.diff_24h.USDT (chuỗi dạng "−10.25%")
   const change24hRaw = jetton.price?.diff_24h?.USDT || null;
@@ -245,7 +251,8 @@ const itemHTML = `
       <strong>${name} ${verifiedBadge} ${warningIcon}</strong>
       <p>${formattedBalance} ${symbol} ≈ $${valueInUSDT.toLocaleString("en-US", { minimumFractionDigits: 2 })} ≈ ${valueInVND.toLocaleString("vi-VN", { style: 'currency', currency: 'VND' })}</p>
       <p style="color: ${change24hNumber >= 0 ? 'green' : 'red'};">
-        $${priceUSDT < 0.000001 ? '0' : priceUSDT.toFixed(6)}
+        $${priceUSDT < 0.000001 ? '0' : parseFloat(priceUSDT.toFixed(6)).toString()}
+
  (${changeSign}${(change24hNumber ?? 0).toFixed(2)}%)
       </p>
     </div>
