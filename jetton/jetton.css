@@ -43,12 +43,19 @@ zero-balance-list
 
     }
 
-    #connect-only {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-    }
+#connect-only {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+  z-index: 9999; /* đảm bảo nó nằm trên các phần khác nếu cần */
+}
 
 #disconnect-wallet {
   margin-top: 20px;
