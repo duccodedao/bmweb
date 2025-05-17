@@ -73,21 +73,26 @@ async function fetchJettons(walletAddress) {
     // 3. Tính tổng giá trị quy đổi ra USDT
     const tonValueInUSDT = tonBalance * tonPrice;
 
-    const tonHTML = `
-      <div class="jetton-item">
-        <img src="/logo-coin/ton.jpg" alt="TON" class="jetton-logo">
-        <div class="jetton-info">
-          <strong>TON
-            <img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg" 
-                 alt="verified" width="16" class="verified-badge">
-          </strong>
-          <p>${tonBalance.toLocaleString("vi-VN", { maximumFractionDigits: 9 })} TON ≈ $${tonValueInUSDT.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT</strong></p>
-          <p style="color: ${tonChange >= 0 ? 'green' : 'red'};">
-            $${tonPrice.toFixed(3)} (${changeSign}${tonChange.toFixed(2)}%)
-          </p>
-        </div>
-      </div>
-    `;
+const tonHTML = `
+  <div class="jetton-item">
+    <div class="jetton-logo-wrapper">
+      <img src="/logo-coin/ton.jpg" alt="TON" class="jetton-logo">
+      <img src="/logo-coin/ton.jpg" 
+           alt="TON Network" class="jetton-network-badge">
+    </div>
+    <div class="jetton-info">
+      <strong>TON
+        <img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg" 
+             alt="verified" width="16" class="verified-badge">
+      </strong>
+      <p>${tonBalance.toLocaleString("vi-VN", { maximumFractionDigits: 9 })} TON ≈ $${tonValueInUSDT.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+      <p style="color: ${tonChange >= 0 ? 'green' : 'red'};">
+        $${tonPrice.toFixed(3)} (${changeSign}${tonChange.toFixed(2)}%)
+      </p>
+    </div>
+  </div>
+`;
+
     list.innerHTML += tonHTML;
 
     // Nếu muốn hiển thị tổng giá trị USD ví:
@@ -128,16 +133,21 @@ async function fetchJettons(walletAddress) {
         ? '<img src="https://cdn-icons-png.flaticon.com/512/1828/1828843.png" alt="warning" width="16" title="Token chưa xác minh hoặc đáng nghi" class="warning-badge">'
         : '';
 
-      const itemHTML = `
-        <div class="jetton-item" onclick="fetchJettonInfo('${jettonAddress}')">
-          <img src="${image}" alt="${name}" class="jetton-logo">
-          <div class="jetton-info">
-            <strong>${name} ${verifiedBadge} ${warningIcon}</strong>
-            <p>${formattedBalance} ${symbol}</p>
-          </div>
-          <a href="https://tonviewer.com/${walletAddress}/jetton/${jettonAddress}" class="jetton-address-link" target="_blank">View</a>
-        </div>
-      `;
+const itemHTML = `
+  <div class="jetton-item" onclick="fetchJettonInfo('${jettonAddress}')">
+    <div class="jetton-logo-wrapper">
+      <img src="${image}" alt="${name}" class="jetton-logo">
+      <img src="/logo-coin/ton.jpg" 
+           alt="TON Network" class="jetton-network-badge">
+    </div>
+    <div class="jetton-info">
+      <strong>${name} ${verifiedBadge} ${warningIcon}</strong>
+      <p>${formattedBalance} ${symbol}</p>
+    </div>
+    <a href="https://tonviewer.com/${walletAddress}/jetton/${jettonAddress}" class="jetton-address-link" target="_blank">View</a>
+  </div>
+`;
+
 
       if (balance > 0) {
         list.innerHTML += itemHTML;
