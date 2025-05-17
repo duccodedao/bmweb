@@ -214,7 +214,7 @@ for (const jetton of data.balances) {
 
 // Nếu là địa chỉ đặc biệt, gán giá thủ công
 if (jetton.jetton.address === '0:18326f7ba223e01d69238f38b419109ce7074104d79bbfbad48b3eff5228396b') {
-  priceUSDT = 0.0000000128;
+  priceUSDT = 0.00000128;
 }
 
 
