@@ -210,13 +210,21 @@ for (const jetton of data.balances) {
     ? '<img src="https://cdn-icons-png.flaticon.com/512/1828/1828843.png" alt="warning" width="16" title="Token chưa xác minh hoặc đáng nghi" class="warning-badge">'
     : '';
 
-  // Lấy giá USDT nếu có trong price.prices.USDT
- let priceUSDT = jetton.price?.prices?.USDT || 0;
+// Định nghĩa giá thủ công cho nhiều jetton đặc biệt
+const manualPrices = {
+  '0:18326f7ba223e01d69238f38b419109ce7074104d79bbfbad48b3eff5228396b': 0.00000001,
+  '0:fbdf9ac83a9f1f7b7ef6dad118636de0ee3e25cfd8f9f736bf08b3e13942560d': 0.00000005,
+  // thêm các địa chỉ khác ở đây nếu cần
+};
 
-// Nếu là địa chỉ đặc biệt, gán giá thủ công
-if (jetton.jetton.address === '0:18326f7ba223e01d69238f38b419109ce7074104d79bbfbad48b3eff5228396b') {
-  priceUSDT = 0.0001;
+// Lấy giá USDT nếu có trong price.prices.USDT
+let priceUSDT = jetton.price?.prices?.USDT || 0;
+
+// Gán giá thủ công nếu có trong manualPrices
+if (manualPrices[jetton.jetton.address] !== undefined) {
+  priceUSDT = manualPrices[jetton.jetton.address];
 }
+
 
 
   // Lấy % biến động 24h trong price.diff_24h.USDT (chuỗi dạng "−10.25%")
