@@ -420,4 +420,25 @@
 }
 
 
+.jetton-logo-wrapper {
+  position: relative;
+  display: inline-block; /* để dễ căn chỉnh */
+}
+
+.jetton-network-badge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid white;
+  background-color: white;
+
+  /* chỉnh dịch sang trái bằng translateX */
+  transform: translateX(-60%);
+  /* hoặc chỉnh margin-right âm nếu muốn */
+  /* margin-right: -3px; */
+}
+
 
