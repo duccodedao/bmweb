@@ -50,16 +50,41 @@ zero-balance-list
       flex-direction: column;
     }
 
-    #disconnect-wallet {
-      margin-top: 20px;
-      display: none;
-      padding: 10px 20px;
-      background-color: #ff4c4c;
-      color: white;
-      border: none;
-      border-radius: 25px;
-      cursor: pointer;
-    }
+#disconnect-wallet {
+  margin-top: 20px;
+  display: none;
+  padding: 10px 20px;
+  background-color: #ff4c4c;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: background-color 0.3s ease;
+}
+
+#disconnect-wallet::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.2) 0%,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 255, 0.2) 100%
+  );
+  transform: skewX(-20deg);
+  transition: left 0.5s ease;
+}
+
+#disconnect-wallet:hover::before {
+  left: 125%;
+}
+
 
     h2 {
       font-size: 22px;
@@ -236,19 +261,6 @@ zero-balance-list
 }
 
 
-
-
-
-  #disconnect-wallet {
-  display: none;
-  padding: 8px 14px;
-  background-color: #ff4c4c;
-  color: white;
-  border: none;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 14px;
-}
 
 
 
