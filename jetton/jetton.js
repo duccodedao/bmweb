@@ -210,6 +210,16 @@ for (const jetton of data.balances) {
     ? '<img src="https://cdn-icons-png.flaticon.com/512/1828/1828843.png" alt="warning" width="16" title="Token chưa xác minh hoặc đáng nghi" class="warning-badge">'
     : '';
 
+
+
+
+
+
+
+
+
+
+
 // Định nghĩa giá thủ công cho nhiều jetton đặc biệt
 const manualPrices = {
   '0:18326f7ba223e01d69238f38b419109ce7074104d79bbfbad48b3eff5228396b': 0.00000001,
@@ -224,6 +234,21 @@ let priceUSDT = jetton.price?.prices?.USDT || 0;
 if (manualPrices[jetton.jetton.address] !== undefined) {
   priceUSDT = manualPrices[jetton.jetton.address];
 }
+
+
+//Thay thế khi lỗi: const priceUSDT = jetton.price?.prices?.USDT || 0;//
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
