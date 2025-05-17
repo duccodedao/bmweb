@@ -393,6 +393,13 @@
 
 
 
+#token-header {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* khoảng cách giữa avatar và tên */
+  margin: 0;
+  font-size: 20px;
+}
 
 
 
