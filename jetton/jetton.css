@@ -1,4 +1,4 @@
-
+zero-balance-list
     * {
       margin: 0;
       padding: 0;
@@ -40,7 +40,7 @@
       min-height: 100vh;
       color: #333;
       padding: 20px;
-      justify-content: center;
+
     }
 
     #connect-only {
@@ -157,7 +157,7 @@
   width: 100%;
   max-width: 600px;
   margin-top: 10px;
-  margin-bottom: 85px;
+  margin-bottom: 10px;
   animation: fadeIn 0.3s ease-in-out;
 }
 
@@ -175,6 +175,13 @@
 #see-all-btn:hover {
   color: rgba(0, 0, 0, 1); /* Hover rõ hơn một chút */
 }
+#see-all-btn .dashes {
+  color: gray;
+}
+#see-all-btn .text {
+  margin: 0 4px;
+}
+
 
 @keyframes fadeIn {
   from {
@@ -440,5 +447,3 @@
   /* hoặc chỉnh margin-right âm nếu muốn */
   /* margin-right: -3px; */
 }
-
-
