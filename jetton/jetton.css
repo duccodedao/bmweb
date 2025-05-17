@@ -284,35 +284,40 @@ zero-balance-list
 
 
 
-/* Popup overlay full màn hình, dùng flex để căn giữa */
-.jetton-info-popup {
-  display: none; /* Mặc định ẩn */
-  position: fixed;
-  inset: 0; /* top:0; right:0; bottom:0; left:0 */
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 10000;
-  padding: 20px;
-  overflow-y: auto;
 
-  /* Flex để căn popup ở giữa màn hình */
-  display: flex;
+/* Overlay full màn hình */
+.jetton-info-popup {
+  display: none; /* Ẩn mặc định */
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+
+
+  /* Flex để căn giữa */
+display: none;
   justify-content: center;
-  align-items: flex-start; /* Cách trên 100px ở desktop */
-  padding-top: 100px;
+  align-items: center;
+
+  /* Khi popup dài, cho phép scroll */
+  overflow-y: auto;
+  padding: 20px;
   box-sizing: border-box;
 }
 
 /* Nội dung popup */
 .jetton-info-popup-content {
+  margin-top: 90px;
   background: #fff;
-  padding: 20px 30px;
-  max-width: 500px;
-  width: 100%;
   border-radius: 20px;
-  position: relative;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-  animation: fadeIn 0.3s ease forwards;
+  max-width: 480px;
+  width: 100%;
+  padding: 20px 30px;
   box-sizing: border-box;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.3s ease forwards;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 /* Nút đóng */
@@ -320,25 +325,25 @@ zero-balance-list
   position: absolute;
   top: 12px;
   right: 12px;
-  background: #f44336;
-  color: #fff;
-  border: none;
-  border-radius: 50%;
   width: 32px;
   height: 32px;
-  cursor: pointer;
+  border-radius: 50%;
+  background: #f44336;
+  color: white;
+  border: none;
   font-weight: bold;
   font-size: 20px;
+  cursor: pointer;
   line-height: 32px;
   text-align: center;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s;
 }
 
 .close-popup:hover {
   background: #d32f2f;
 }
 
-/* Các đoạn text, list bên trong */
+/* Text và danh sách */
 .jetton-info-popup-content p,
 .jetton-info-popup-content ul {
   margin: 12px 0;
@@ -360,7 +365,6 @@ zero-balance-list
   text-decoration: underline;
 }
 
-/* Animation fade in */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -371,6 +375,8 @@ zero-balance-list
     transform: translateY(0);
   }
 }
+
+
 
 
 
