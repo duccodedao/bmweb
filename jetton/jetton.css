@@ -54,7 +54,7 @@ zero-balance-list
   justify-content: center;
   flex-direction: column;
 
-  z-index: 9999; /* đảm bảo nó nằm trên các phần khác nếu cần */
+ 
 }
 
 #disconnect-wallet {
