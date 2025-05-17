@@ -105,22 +105,46 @@ zero-balance-list
       max-width: 600px;    
 
     }
+.jetton-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: #e0e5ec;
+  padding: 16px;
+  border-radius: 14px;
+  margin-bottom: 14px;
+  box-shadow: inset 2px 2px 6px #c3c8d3, inset -2px -2px 6px #ffffff;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden; /* quan trọng để che phần shine vượt ra ngoài */
+}
 
-    .jetton-item {
-      display: flex;
-      align-items: center;
-      background: #e0e5ec;
-      padding: 16px;
-      border-radius: 14px;
-      margin-bottom: 14px;
-      box-shadow: inset 2px 2px 6px #c3c8d3, inset -2px -2px 6px #ffffff;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
+.jetton-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.2) 0%,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 255, 0.2) 100%
+  );
+  transform: skewX(-20deg);
+  transition: left 0.5s ease;
+  pointer-events: none; /* để không chặn click */
+}
 
-    .jetton-item:hover {
-      transform: translateY(-2px);
-      box-shadow: inset 2px 2px 8px #b5bbc6, inset -2px -2px 8px #ffffff;
-    }
+.jetton-item:hover::before {
+  left: 125%;
+}
+
+.jetton-item:hover {
+  transform: translateY(-2px);
+  box-shadow: inset 2px 2px 8px #b5bbc6, inset -2px -2px 8px #ffffff;
+}
+
 
     .jetton-logo {
       width: 40px;
