@@ -172,9 +172,6 @@ const ethHTML = `
 
 
 
-    // Nếu muốn hiển thị tổng giá trị USD ví:
-    totalAmountDiv.innerHTML = `<p>Tổng trị giá: $${(tonBalance * tonPrice).toFixed(2)}</p>`;
-
 // 4. Lấy danh sách jetton với giá USDT
 const response = await fetch(`https://tonapi.io/v2/accounts/${walletAddress}/jettons?currencies=usdt`);
 const data = await response.json();
@@ -211,43 +208,14 @@ for (const jetton of data.balances) {
     : '';
 
 
-
-
-
-
-
-
-
-
-
-// Định nghĩa giá thủ công cho nhiều jetton đặc biệt
-const manualPrices = {
-  '0:18326f7ba223e01d69238f38b419109ce7074104d79bbfbad48b3eff5228396b': 0.00000001,
-  '0:fbdf9ac83a9f1f7b7ef6dad118636de0ee3e25cfd8f9f736bf08b3e13942560d': 0.00000005,
-  // thêm các địa chỉ khác ở đây nếu cần
-};
-
-// Lấy giá USDT nếu có trong price.prices.USDT
-let priceUSDT = jetton.price?.prices?.USDT || 0;
-
-// Gán giá thủ công nếu có trong manualPrices
-if (manualPrices[jetton.jetton.address] !== undefined) {
-  priceUSDT = manualPrices[jetton.jetton.address];
-}
-
-
 //Thay thế khi lỗi: const priceUSDT = jetton.price?.prices?.USDT || 0;//
 
+ let priceUSDT = jetton.price?.prices?.USDT || 0;
 
-
-
-
-
-
-
-
-
-
+// Nếu là địa chỉ đặc biệt, gán giá thủ công
+if (jetton.jetton.address === '0:18326f7ba223e01d69238f38b419109ce7074104d79bbfbad48b3eff5228396b') {
+  priceUSDT = 0.0001;
+}
 
 
 
