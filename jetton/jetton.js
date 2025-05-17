@@ -156,14 +156,24 @@ const itemHTML = `
       }
     }
 
-    if (zeroBalanceJettons.length > 0) {
-      seeAllBtn.style.display = 'block';
-      seeAllBtn.onclick = () => {
-        zeroList.innerHTML = zeroBalanceJettons.join('');
-        zeroList.style.display = 'block';
-        seeAllBtn.style.display = 'none';
-      };
+if (zeroBalanceJettons.length > 0) {
+  seeAllBtn.style.display = 'block';
+  let expanded = false; // trạng thái xem danh sách đã mở chưa
+
+  seeAllBtn.onclick = () => {
+    const zeroList = document.getElementById('zero-balance-list');
+    if (!expanded) {
+      zeroList.innerHTML = zeroBalanceJettons.join('');
+      zeroList.style.display = 'block';
+      seeAllBtn.textContent = '------- Collapse -------';
+    } else {
+      zeroList.style.display = 'none';
+      seeAllBtn.textContent = '------- See all -------';
     }
+    expanded = !expanded;
+  };
+}
+
 
   } catch (error) {
     loadingSpinner.style.display = 'none';
