@@ -41,7 +41,6 @@ const connectUI = new TON_CONNECT_UI.TonConnectUI({
 
 
 
-
 async function fetchJettons(walletAddress) {
   const loadingSpinner = document.getElementById('loading-spinner');
   const list = document.getElementById('jettons-list');
@@ -70,45 +69,108 @@ async function fetchJettons(walletAddress) {
     const tonChange = ((tonPrice - tonOpen) / tonOpen) * 100;
     const changeSign = tonChange >= 0 ? '+' : '';
 
- // 3. Tính tổng giá trị quy đổi ra USDT
-const tonValueInUSDT = tonBalance * tonPrice;
+    // 3. Tính tổng giá trị quy đổi ra USDT
+    const tonValueInUSDT = tonBalance * tonPrice;
 
-// 4. Lấy tỷ giá USDT/VND (ví dụ từ CoinGecko)
-const vndRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=vnd');
-const vndData = await vndRes.json();
-const usdtToVnd = vndData.tether.vnd;
+    // 4. Lấy tỷ giá USDT/VND từ CoinGecko
+    const vndRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=vnd');
+    const vndData = await vndRes.json();
+    const usdtToVnd = vndData.tether.vnd;
 
-// 5. Tính giá trị TON quy đổi ra VND
-const tonValueInVND = tonValueInUSDT * usdtToVnd;
+    // 5. Tính giá trị TON quy đổi ra VND
+    const tonValueInVND = tonValueInUSDT * usdtToVnd;
 
-const tonHTML = `
+    // TON HTML
+    const tonHTML = `
+      <div class="jetton-item">
+        <div class="jetton-logo-wrapper">
+          <img src="/logo-coin/ton.jpg" alt="TON" class="jetton-logo">
+          <img src="/logo-coin/ton.jpg" alt="TON Network" class="jetton-network-badge">
+        </div>
+        <div class="jetton-info">
+          <strong>TON
+            <img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg" alt="verified" width="16" class="verified-badge">
+          </strong>
+          <p>
+            ${tonBalance.toLocaleString("vi-VN", { maximumFractionDigits: 9 })} TON ≈ 
+            $${tonValueInUSDT.toLocaleString("en-US", { minimumFractionDigits: 2 })} ≈ 
+            ${tonValueInVND.toLocaleString("vi-VN", { style: 'currency', currency: 'VND' })}
+          </p>
+          <p style="color: ${tonChange >= 0 ? 'green' : 'red'};">
+            $${tonPrice.toFixed(3)} ≈ ${ (tonPrice * usdtToVnd).toLocaleString("vi-VN", { style: "currency", currency: "VND" }) }
+            (${changeSign}${tonChange.toFixed(2)}%)
+          </p>
+        </div>
+      </div>
+    `;
+
+    // Lấy giá BTC/USDT
+    const btcRes = await fetch('https://www.okx.com/api/v5/market/ticker?instId=BTC-USDT');
+    const btcData = await btcRes.json();
+    const btcPrice = parseFloat(btcData.data[0].last);
+    const btcOpen = parseFloat(btcData.data[0].open24h);
+    const btcChange = ((btcPrice - btcOpen) / btcOpen) * 100;
+    const btcChangeSign = btcChange >= 0 ? '+' : '';
+    const btcPriceVND = btcPrice * usdtToVnd;
+
+const btcHTML = `
   <div class="jetton-item">
     <div class="jetton-logo-wrapper">
-      <img src="/logo-coin/ton.jpg" alt="TON" class="jetton-logo">
-      <img src="/logo-coin/ton.jpg" 
-           alt="TON Network" class="jetton-network-badge">
+      <img src="/logo-coin/btc.jpg" alt="BTC" class="jetton-logo">
+      <img src="/logo-coin/btc.jpg" alt="Bitcoin Network" class="jetton-network-badge">
     </div>
     <div class="jetton-info">
-      <strong>TON
-        <img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg" 
-             alt="verified" width="16" class="verified-badge">
+      <strong>BTC
+        <img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg" alt="verified" width="16" class="verified-badge">
       </strong>
       <p>
-        ${tonBalance.toLocaleString("vi-VN", { maximumFractionDigits: 9 })} TON ≈ 
-        $${tonValueInUSDT.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ≈ 
-        ${tonValueInVND.toLocaleString("vi-VN", { style: 'currency', currency: 'VND' })}
+        $${btcPrice.toLocaleString("en-US", { minimumFractionDigits: 2 })} ≈ 
+        ${btcPriceVND.toLocaleString("vi-VN", { style: 'currency', currency: 'VND' })}
+        <span style="color: ${btcChange >= 0 ? 'green' : 'red'};">
+          (${btcChangeSign}${btcChange.toFixed(2)}%)
+        </span>
       </p>
-<p style="color: ${tonChange >= 0 ? 'green' : 'red'};">
-  $${tonPrice.toFixed(3)} ≈ ${ (tonPrice * usdtToVnd).toLocaleString("vi-VN", { style: "currency", currency: "VND" }) }
-  (${changeSign}${tonChange.toFixed(2)}%)
-</p>
-
     </div>
   </div>
 `;
 
+    // Lấy giá ETH/USDT
+    const ethRes = await fetch('https://www.okx.com/api/v5/market/ticker?instId=ETH-USDT');
+    const ethData = await ethRes.json();
+    const ethPrice = parseFloat(ethData.data[0].last);
+    const ethOpen = parseFloat(ethData.data[0].open24h);
+    const ethChange = ((ethPrice - ethOpen) / ethOpen) * 100;
+    const ethChangeSign = ethChange >= 0 ? '+' : '';
+    const ethPriceVND = ethPrice * usdtToVnd;
 
+    // ETH
+const ethHTML = `
+  <div class="jetton-item">
+    <div class="jetton-logo-wrapper">
+      <img src="/logo-coin/eth.jpg" alt="ETH" class="jetton-logo">
+      <img src="/logo-coin/eth.jpg" alt="Ethereum Network" class="jetton-network-badge">
+    </div>
+    <div class="jetton-info">
+      <strong>ETH
+        <img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg" alt="verified" width="16" class="verified-badge">
+      </strong>
+      <p>
+        $${ethPrice.toLocaleString("en-US", { minimumFractionDigits: 2 })} ≈ 
+        ${ethPriceVND.toLocaleString("vi-VN", { style: 'currency', currency: 'VND' })}
+        <span style="color: ${ethChange >= 0 ? 'green' : 'red'};">
+          (${ethChangeSign}${ethChange.toFixed(2)}%)
+        </span>
+      </p>
+    </div>
+  </div>
+`;
+
+    // Hiển thị lên giao diện
     list.innerHTML += tonHTML;
+    list.innerHTML += btcHTML;
+    list.innerHTML += ethHTML;
+
+
 
     // Nếu muốn hiển thị tổng giá trị USD ví:
     totalAmountDiv.innerHTML = `<p>Tổng trị giá: $${(tonBalance * tonPrice).toFixed(2)}</p>`;
