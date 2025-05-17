@@ -284,49 +284,66 @@ zero-balance-list
 
 
 
-
+/* Popup overlay full màn hình, dùng flex để căn giữa */
 .jetton-info-popup {
-  display: none;
+  display: none; /* Mặc định ẩn */
   position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.5);
-  z-index: 1000;
+  inset: 0; /* top:0; right:0; bottom:0; left:0 */
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 10000;
   padding: 20px;
   overflow-y: auto;
+
+  /* Flex để căn popup ở giữa màn hình */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Cách trên 100px ở desktop */
+  padding-top: 100px;
+  box-sizing: border-box;
 }
 
+/* Nội dung popup */
 .jetton-info-popup-content {
-  background: white;
-  padding: 20px;
+  background: #fff;
+  padding: 20px 30px;
   max-width: 500px;
-  margin: 100px auto;
+  width: 100%;
   border-radius: 20px;
   position: relative;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-  animation: fadeIn 0.3s ease;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.3s ease forwards;
+  box-sizing: border-box;
 }
 
+/* Nút đóng */
 .close-popup {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 12px;
+  right: 12px;
   background: #f44336;
-  color: white;
+  color: #fff;
   border: none;
   border-radius: 50%;
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   cursor: pointer;
   font-weight: bold;
-  font-size: 18px;
-  line-height: 30px;
+  font-size: 20px;
+  line-height: 32px;
+  text-align: center;
+  transition: background-color 0.3s ease;
 }
 
+.close-popup:hover {
+  background: #d32f2f;
+}
+
+/* Các đoạn text, list bên trong */
 .jetton-info-popup-content p,
 .jetton-info-popup-content ul {
-  margin: 10px 0;
+  margin: 12px 0;
   font-size: 15px;
+  line-height: 1.5;
 }
 
 .jetton-info-popup-content ul {
@@ -343,14 +360,17 @@ zero-balance-list
   text-decoration: underline;
 }
 
+/* Animation fade in */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-
-
-
-
 
 
 
