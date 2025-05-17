@@ -1,6 +1,6 @@
 
     const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-        manifestUrl: 'https://bmasshd.click/tonconnect-manifest.json',
+        manifestUrl: 'https://bmweb.site/tonconnect-manifest.json',
         buttonRootId: 'ton-connect'
     });
 
