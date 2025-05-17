@@ -175,55 +175,84 @@ const ethHTML = `
     // Nếu muốn hiển thị tổng giá trị USD ví:
     totalAmountDiv.innerHTML = `<p>Tổng trị giá: $${(tonBalance * tonPrice).toFixed(2)}</p>`;
 
-    // 4. Lấy danh sách jetton
-    const response = await fetch(`https://tonapi.io/v2/accounts/${walletAddress}/jettons`);
-    const data = await response.json();
-    loadingSpinner.style.display = 'none';
+// 4. Lấy danh sách jetton với giá USDT
+const response = await fetch(`https://tonapi.io/v2/accounts/${walletAddress}/jettons?currencies=usdt`);
+const data = await response.json();
+loadingSpinner.style.display = 'none';
 
-    if (!data.balances || data.balances.length === 0) {
-      tokenHeader.style.display = 'none';
-      return;
-    }
-    tokenHeader.style.display = 'block';
+if (!data.balances || data.balances.length === 0) {
+  tokenHeader.style.display = 'none';
+  return;
+}
+tokenHeader.style.display = 'block';
 
-    const zeroBalanceJettons = [];
+const zeroBalanceJettons = [];
 
-    for (const jetton of data.balances) {
-      const decimals = jetton.jetton.decimals || 9;
-      const balance = parseFloat(jetton.balance) / (10 ** decimals);
-      const formattedBalance = balance.toLocaleString("vi-VN", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: decimals > 5 ? 5 : decimals
-      });
+for (const jetton of data.balances) {
+  const decimals = jetton.jetton.decimals || 9;
+  const balance = parseFloat(jetton.balance) / (10 ** decimals);
+  const formattedBalance = balance.toLocaleString("vi-VN", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: decimals > 5 ? 5 : decimals
+  });
 
-      const name = jetton.jetton.name || '';
-      const symbol = jetton.jetton.symbol || '';
-      const image = jetton.jetton.image || 'https://duccodedao.github.io/web/logo-coin/bmlogo.jpg';
-      const jettonAddress = jetton.jetton.address;
-      const isVerified = jetton.jetton.verification === "whitelist";
-      const verifiedBadge = isVerified
-        ? '<img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg" alt="verified" width="16" class="verified-badge">'
-        : '';
+  const name = jetton.jetton.name || '';
+  const symbol = jetton.jetton.symbol || '';
+  const image = jetton.jetton.image || 'https://duccodedao.github.io/web/logo-coin/bmlogo.jpg';
+  const jettonAddress = jetton.jetton.address;
+  const isVerified = jetton.jetton.verification === "whitelist";
+  const verifiedBadge = isVerified
+    ? '<img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg" alt="verified" width="16" class="verified-badge">'
+    : '';
 
-      const isSuspicious = !isVerified || image.includes("placeholder");
-      const warningIcon = isSuspicious
-        ? '<img src="https://cdn-icons-png.flaticon.com/512/1828/1828843.png" alt="warning" width="16" title="Token chưa xác minh hoặc đáng nghi" class="warning-badge">'
-        : '';
+  const isSuspicious = !isVerified || image.includes("placeholder");
+  const warningIcon = isSuspicious
+    ? '<img src="https://cdn-icons-png.flaticon.com/512/1828/1828843.png" alt="warning" width="16" title="Token chưa xác minh hoặc đáng nghi" class="warning-badge">'
+    : '';
+
+  // Lấy giá USDT nếu có trong price.prices.USDT
+  const priceUSDT = jetton.price?.prices?.USDT || 0;
+
+  // Lấy % biến động 24h trong price.diff_24h.USDT (chuỗi dạng "−10.25%")
+  const change24hRaw = jetton.price?.diff_24h?.USDT || null;
+
+  // Chuyển đổi chuỗi biến động sang số (loại bỏ dấu % và dấu âm)
+  let change24hNumber = null;
+  if (change24hRaw) {
+    // Loại bỏ dấu % và dấu âm đặc biệt nếu có
+    const normalized = change24hRaw.replace(/[−–]/g, '-').replace('%', '');
+    change24hNumber = parseFloat(normalized);
+  }
+
+  // Tạo dấu + hoặc - cho hiển thị
+  const changeSign = (change24hNumber !== null && change24hNumber > 0) ? '+' : '';
+
+  const priceAndChangeHTML = priceUSDT
+    ? `<p>$${priceUSDT.toFixed(6)} ${change24hNumber !== null ? `(<span style="color: ${change24hNumber >= 0 ? 'green' : 'red'}">${changeSign}${change24hNumber.toFixed(2)}%</span>)` : ''}</p>`
+    : '';
+
+// Tính giá trị Jetton theo USDT và VND
+const valueInUSDT = balance * priceUSDT;
+const valueInVND = valueInUSDT * usdtToVnd;
 
 const itemHTML = `
   <div class="jetton-item" onclick="fetchJettonInfo('${jettonAddress}')">
     <div class="jetton-logo-wrapper">
       <img src="${image}" alt="${name}" class="jetton-logo">
-      <img src="/logo-coin/ton.jpg" 
-           alt="TON Network" class="jetton-network-badge">
+      <img src="/logo-coin/ton.jpg" alt="TON Network" class="jetton-network-badge">
     </div>
     <div class="jetton-info">
       <strong>${name} ${verifiedBadge} ${warningIcon}</strong>
-      <p>${formattedBalance} ${symbol}</p>
+      <p>${formattedBalance} ${symbol} ≈ $${valueInUSDT.toLocaleString("en-US", { minimumFractionDigits: 2 })} ≈ ${valueInVND.toLocaleString("vi-VN", { style: 'currency', currency: 'VND' })}</p>
+      <p style="color: ${change24hNumber >= 0 ? 'green' : 'red'};">
+        $${priceUSDT < 0.000001 ? '0' : priceUSDT.toFixed(6)}
+ (${changeSign}${(change24hNumber ?? 0).toFixed(2)}%)
+      </p>
     </div>
     <a href="https://tonviewer.com/${walletAddress}/jetton/${jettonAddress}" class="jetton-address-link" target="_blank">View</a>
   </div>
 `;
+
 
 
       if (balance > 0) {
