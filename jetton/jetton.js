@@ -70,8 +70,16 @@ async function fetchJettons(walletAddress) {
     const tonChange = ((tonPrice - tonOpen) / tonOpen) * 100;
     const changeSign = tonChange >= 0 ? '+' : '';
 
-    // 3. Tính tổng giá trị quy đổi ra USDT
-    const tonValueInUSDT = tonBalance * tonPrice;
+ // 3. Tính tổng giá trị quy đổi ra USDT
+const tonValueInUSDT = tonBalance * tonPrice;
+
+// 4. Lấy tỷ giá USDT/VND (ví dụ từ CoinGecko)
+const vndRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=vnd');
+const vndData = await vndRes.json();
+const usdtToVnd = vndData.tether.vnd;
+
+// 5. Tính giá trị TON quy đổi ra VND
+const tonValueInVND = tonValueInUSDT * usdtToVnd;
 
 const tonHTML = `
   <div class="jetton-item">
@@ -85,13 +93,20 @@ const tonHTML = `
         <img src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Twitter_Verified_Badge.svg" 
              alt="verified" width="16" class="verified-badge">
       </strong>
-      <p>${tonBalance.toLocaleString("vi-VN", { maximumFractionDigits: 9 })} TON ≈ $${tonValueInUSDT.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-      <p style="color: ${tonChange >= 0 ? 'green' : 'red'};">
-        $${tonPrice.toFixed(3)} (${changeSign}${tonChange.toFixed(2)}%)
+      <p>
+        ${tonBalance.toLocaleString("vi-VN", { maximumFractionDigits: 9 })} TON ≈ 
+        $${tonValueInUSDT.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ≈ 
+        ${tonValueInVND.toLocaleString("vi-VN", { style: 'currency', currency: 'VND' })}
       </p>
+<p style="color: ${tonChange >= 0 ? 'green' : 'red'};">
+  $${tonPrice.toFixed(3)} ≈ ${ (tonPrice * usdtToVnd).toLocaleString("vi-VN", { style: "currency", currency: "VND" }) }
+  (${changeSign}${tonChange.toFixed(2)}%)
+</p>
+
     </div>
   </div>
 `;
+
 
     list.innerHTML += tonHTML;
 
