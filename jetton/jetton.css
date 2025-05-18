@@ -525,8 +525,9 @@ display: none;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 50px;
+  height: 65px;
   text-align: center;
+
 }
 
 .total-asset strong {
@@ -537,4 +538,69 @@ display: none;
   font-size: 1.2rem;
   font-weight: bold;
   margin: 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#friendly-address-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* căn giữa ngang */
+  gap: 6px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  max-width: 280px;
+  margin: 0 auto;
+  user-select: none;
+}
+
+#friendly-address {
+  font-size: 1.2rem;
+  color: #00796b;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#copy-friendly-icon {
+  font-size: 16px;
+  color: #00796b;
+  transition: color 0.2s ease;
+}
+
+#copy-friendly-icon:hover {
+  color: #004085;
+}
+
+
+
+
+.swal2-toast-success,
+.swal2-toast-error {
+  margin-top: 90px !important; /* 👈 Cách top 90px */
+  border-radius: 12px !important;
+  box-shadow: 0 0 12px rgba(0,0,0,0.15);
+  font-weight: 600;
 }
