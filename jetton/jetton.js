@@ -55,6 +55,36 @@ async function fetchJettons(walletAddress) {
   zeroList.style.display = 'none';
   seeAllBtn.style.display = 'none';
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   try {
     // 1. Lấy số dư TON Coin
     const tonRes = await fetch(`https://tonapi.io/v2/accounts/${walletAddress}`);
@@ -269,14 +299,31 @@ const itemHTML = `
       }
     }
 
-if (zeroBalanceJettons.length > 0) {
-  // Tổng giá trị tài sản = TON + Jettons
-  const allValueInUSDT = tonValueInUSDT + totalJettonValueInUSDT;
-  const allValueInVND = allValueInUSDT * usdtToVnd;
+
+
+
+
+
+
+
+
+
+
+ if (zeroBalanceJettons.length > 0) {
+    // Tổng giá trị tài sản = TON + Jettons
+    const allValueInUSDT = tonValueInUSDT + totalJettonValueInUSDT;
+    const allValueInVND = allValueInUSDT * usdtToVnd;
+
 const totalAssetHTML = `
   <div class="jetton-item total-asset">
     <div class="jetton-info">
-      <strong>Total Balence</strong>
+      <strong>Total Balance</strong>
+
+      <div id="friendly-address-wrapper">
+        <span id="friendly-address">Đang tải địa chỉ...</span>
+        <i id="copy-friendly-icon" class="fas fa-copy"></i>
+      </div>
+
       <p>
         ≈ $${allValueInUSDT.toLocaleString("en-US", { minimumFractionDigits: 2 })} ≈ 
         ${allValueInVND.toLocaleString("vi-VN", { style: 'currency', currency: 'VND' })}
@@ -286,7 +333,69 @@ const totalAssetHTML = `
 `;
 
 
+
+
   list.innerHTML = totalAssetHTML + list.innerHTML; // ✅ Đặt ở đầu
+
+
+
+async function loadFriendlyAddress() {
+  try {
+    const res = await fetch(`https://toncenter.com/api/v2/detectAddress?address=${walletAddress}`);
+    const detectData = await res.json();
+
+    if (detectData.ok && detectData.result) {
+      const friendlyAddr = detectData.result.non_bounceable.b64url;
+      const shortFriendly = `${friendlyAddr.slice(0,8)}...${friendlyAddr.slice(-8)}`;
+      document.getElementById("friendly-address").textContent = shortFriendly;
+
+      const copyFriendly = () => {
+        navigator.clipboard.writeText(friendlyAddr).then(() => {
+Swal.fire({
+  icon: 'success',
+  title: 'Đã sao chép!',
+  toast: true,
+  position: 'top-right',
+  timer: 2000,
+  showConfirmButton: false,
+  timerProgressBar: true,
+  padding: '10px 15px',
+  customClass: {
+    popup: 'swal2-toast-success',
+    title: 'swal2-toast-title'
+  }
+});
+        }).catch(() => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Thất bại',
+            toast: true,
+            position: 'top-right',
+            timer: 2000,
+            showConfirmButton: false,
+            timerProgressBar: true,
+            padding: '10px 15px',
+            customClass: {
+              popup: 'swal2-toast-error',
+              title: 'swal2-toast-title'
+            }
+          });
+        });
+      };
+
+      document.getElementById("friendly-address").onclick = copyFriendly;
+      document.getElementById("copy-friendly-icon").onclick = copyFriendly;
+    } else {
+      document.getElementById("friendly-address").textContent = "Không thể lấy ví.";
+    }
+  } catch {
+    document.getElementById("friendly-address").textContent = "Lỗi API.";
+  }
+}
+
+loadFriendlyAddress();
+
+
 
 
   seeAllBtn.style.display = 'block';
@@ -312,6 +421,7 @@ const totalAssetHTML = `
     console.error('ERROR', error);
   }
 }
+
 
 
 
