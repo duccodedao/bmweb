@@ -516,3 +516,25 @@ display: none;
   /* hoặc chỉnh margin-right âm nếu muốn */
   /* margin-right: -3px; */
 }
+
+
+
+
+.total-asset {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  text-align: center;
+}
+
+.total-asset strong {
+  font-size: 1.2rem;
+}
+
+.total-asset p {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 0;
+}
