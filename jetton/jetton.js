@@ -184,6 +184,7 @@ if (!data.balances || data.balances.length === 0) {
 tokenHeader.style.display = 'block';
 
 const zeroBalanceJettons = [];
+let totalJettonValueInUSDT = 0;
 
 for (const jetton of data.balances) {
   const decimals = jetton.jetton.decimals || 9;
@@ -214,7 +215,7 @@ for (const jetton of data.balances) {
 
 // Nếu là địa chỉ đặc biệt, gán giá thủ công
 if (jetton.jetton.address === '0:18326f7ba223e01d69238f38b419109ce7074104d79bbfbad48b3eff5228396b') {
-  priceUSDT = 0.00000128;
+  priceUSDT = 0.000000001;
 }
 
 
@@ -241,6 +242,7 @@ if (jetton.jetton.address === '0:18326f7ba223e01d69238f38b419109ce7074104d79bbfb
 // Tính giá trị Jetton theo USDT và VND
 const valueInUSDT = balance * priceUSDT;
 const valueInVND = valueInUSDT * usdtToVnd;
+totalJettonValueInUSDT += valueInUSDT;
 
 const itemHTML = `
   <div class="jetton-item" onclick="fetchJettonInfo('${jettonAddress}')">
@@ -271,6 +273,25 @@ const itemHTML = `
     }
 
 if (zeroBalanceJettons.length > 0) {
+  // Tổng giá trị tài sản = TON + Jettons
+  const allValueInUSDT = tonValueInUSDT + totalJettonValueInUSDT;
+  const allValueInVND = allValueInUSDT * usdtToVnd;
+const totalAssetHTML = `
+  <div class="jetton-item total-asset">
+    <div class="jetton-info">
+      <strong>Total Balence</strong>
+      <p>
+        ≈ $${allValueInUSDT.toLocaleString("en-US", { minimumFractionDigits: 2 })} ≈ 
+        ${allValueInVND.toLocaleString("vi-VN", { style: 'currency', currency: 'VND' })}
+      </p>
+    </div>
+  </div>
+`;
+
+
+  list.innerHTML = totalAssetHTML + list.innerHTML; // ✅ Đặt ở đầu
+
+
   seeAllBtn.style.display = 'block';
   let expanded = false; // trạng thái xem danh sách đã mở chưa
 
