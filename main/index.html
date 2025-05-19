@@ -1,446 +1,652 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-8PJY7SWBRR"></script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Airdrop cùng BmassHD</title>
-    <link rel="stylesheet" href="/main/main.css">
-    <link rel="stylesheet" href="/css/footer.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark/dark.css">
-    
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Airdrop cùng BmassHD">
-    <meta property="og:description" content="Airdrop Telegram là một cơ hội tuyệt vời để nhận phần thưởng miễn phí từ các dự án blockchain, hãy cùng tham gia cùng BmsssK3 để khám phá những cơ hội hấp dẫn này!">
-    <meta property="og:image" content="http://bmweb.site/logo/bia.png">
-    <meta property="og:url" content="http://bmweb.site/">
-    <meta property="og:type" content="website">
-    
-    <link rel="shortcut icon" href="/logo/bm.png" type="image/png">
-    <link rel="icon" type="image/png" href="/logo/bm.png">
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mini App Telegram</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <script src="/js/ton-connect-bmass.js"></script>
+  <link rel="stylesheet" href="/css/footer.css" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
+  <style>
 
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+* {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+    body {
+      font-family: 'Segoe UI', 'Roboto', sans-serif;
+      background: #e0e5ec;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      color: #333;
+      padding: 20px;
 
-
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-PPD7N5XXJX"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-PPD7N5XXJX');
-    </script>
-
-    
-<script src="/js/ton-connect-bmass.js"></script>
-</head>
-    <style>
-    
-
-
-
-  /* Đảm bảo rằng margin và padding của body không ảnh hưởng đến footer */
-body {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box; /* Đảm bảo các thuộc tính padding, margin được tính đúng */
+    }
+.dark-mode {
+  background: #222;
+  color: #fff;
+}
+.dark-mode .container {
+  background: #333;
+}
+.dark-mode .profile-info h2 {
+  color: #fff;
 }
 
-/* Footer Style */
-footer {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background-color: #1b1b1b;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  height: 80px;
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
-  z-index: 100;
-  margin: 0; /* Đảm bảo không có margin ảnh hưởng */
-  padding: 0; /* Đảm bảo không có padding ảnh hưởng */
-}
 
-.footer-item {
-  flex: 1;
+    .container {
+      max-width: 400px;
+      margin: 80px auto 20px;
+      padding: 15px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      transition: background 0.3s;
+    }
+
+.centered-title {
   text-align: center;
-  text-decoration: none;
-  color: #aaa;
-  font-size: 12px;
-  position: relative;
-  transition: all 0.3s ease;
 }
 
-.footer-item i {
-  font-size: 20px;
-  display: block;
-  margin-bottom: 5px;
+
+    .dark-mode .container {
+      background: #333;
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+    }
+    .profile-left {
+      display: flex;
+      align-items: center;
+    }
+    .profile img {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 3px solid #007bff;
+    }
+    .profile-info {
+      margin-left: 15px;
+      text-align: left;
+    }
+    .profile-info h2 {
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 3px;
+    }
+
+    .profile-info p {
+      font-size: 14px;
+      color: #666;
+    }
+    .dark-mode .profile-info h2 {
+      color: #fff;
+    }
+    .dark-mode .profile-info p {
+      color: #ccc;
+    }
+
+    .toggle-mode {
+      cursor: pointer;
+      font-size: 24px;
+      padding: 10px;
+      transition: color 0.3s;
+    }
+    .dark-mode .toggle-mode {
+      color: yellow;
+    }
+
+    .app-menu {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      padding: 10px;
+    }
+.app {
+  position: relative; /* Cần để ::before định vị chính xác */
+  overflow: hidden;   /* Đảm bảo ::before không tràn ra ngoài */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.3s;
 }
 
-.footer-item:hover {
-  color: #00e0ff;
+.app:hover {
+  transform: scale(1.05);
 }
 
-.footer-item.active {
-  color: #00e0ff;
-}
-
-.footer-item.active::after {
+.app::before {
   content: '';
-  display: none;
   position: absolute;
-  bottom: 5px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 6px;
-  height: 6px;
-  background-color: #00e0ff;
-  border-radius: 50%;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.2) 0%,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 255, 0.2) 100%
+  );
+  transform: skewX(-20deg);
+  transition: left 0.5s ease;
+  z-index: 1;
 }
 
-/* Home Nổi Bật */
-.footer-item.home {
+.app:hover::before {
+  left: 125%;
+}
+
+.app * {
   position: relative;
-  top: -25px;
-  z-index: 101;
+  z-index: 2;
 }
 
-.footer-item.home .home-circle {
-  width: 60px;
-  height: 60px;
-  background: linear-gradient(135deg, #00e0ff, #006eff);
-  border-radius: 50%;
+
+
+
+
+
+
+
+
+    .dark-mode .app {
+      background: #444;
+    }
+    .app img {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 5px;
+    }
+
+
+
+
+/* Kiểu mặc định (chế độ sáng) */
+.app span {
+  font-weight: 600;
+  font-size: 15px;
+color: #000000; /* màu xanh dương */
+  font-family: 'Arial Black', Arial, sans-serif;
+  user-select: none;
+  transition: color 0.3s ease;
+}
+
+
+
+/* Khi hover trên app */
+.app:hover span {
+  color: #ff6600; /* màu cam khi hover */
+}
+
+/* Kiểu cho chế độ dark */
+.dark-mode .app span {
+  color: #ffffff; /* màu xanh sáng phù hợp nền tối */
+}
+
+.dark-mode .app:hover span {
+  color: #ffc107; /* vàng khi hover trong dark mode */
+}
+
+
+
+
+
+
+
+#connect-only {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 15px rgba(0, 224, 255, 0.4);
-  margin: 0 auto 5px auto;
+  flex-direction: column;
+
+ 
+}
+#wallet-address, 
+#friendly-address {
+  display: none;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  color: #333;
+  user-select: all;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 8px;
 }
 
-.footer-item.home i {
-  font-size: 26px;
-  color: #fff;
-  margin: 0;
+#wallet-address:hover, 
+#friendly-address:hover {
+  background: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
-.footer-item.home span {
-  margin-top: 3px;
-  display: block;
-  color: #fff;
-  font-size: 12px;
+.dark-mode #wallet-address,
+.dark-mode #friendly-address {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+  color: #eee;
+  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.05);
 }
-</style>
+
+.dark-mode #wallet-address:hover,
+.dark-mode #friendly-address:hover {
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+}
+
+
+   .custom-toast {
+  border-radius: 25px !important;
+}
+  </style>
+</head>
 <body>
-    <div id="connect-only">
-        <div id="connect-wallet"></div>
+  <div id="connect-only">
+    <div id="connect-wallet"></div>
+  </div>
+
+  <div id="main-content" style="display: none;">
+    <div class="container">
+      <div class="profile">
+        <div class="profile-left">
+          <img src="/logo-coin/ton.jpg" id="avatar" alt="Avatar" />
+          <div class="profile-info">
+            <h2 id="name">Tên Người Dùng</h2>
+            <p id="username">@username</p>
+            <p id="wallet-address" title="test">Đang tải địa chỉ ví...</p>
+            <p id="friendly-address" style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
+            Loading...
+            </p>
+          </div>
+        </div>
+        <div class="toggle-mode" onclick="toggleDarkMode()">🌙
+ 
     </div>
-    
+      </div>
 
 
-
-
-
-    
-
-    
-
-
-<div id="main-content" style="display: none;">   
-  
-    <header class="header">
-        <div class="profile-container">
-            <img id="user-avatar" class="avatar" src="/logo-coin/bmlogo.jpg" alt="Avatar">
-            <div class="user-info">
-                <div id="user-username">@username<i class="fas fa-check-circle verified-icon"></i></div>
-            </div>
+      <h3 class="centered-title">Chuẩn bị Niêm Yết</h3>
+      <div class="app-menu">
+        <div class="app" onclick="openApp('https://t.me/UnichAirdropBot/start')">
+          <img src="/logo-coin/IMG_20241108_121723_913.jpg" />
+          <span>$UN</span>
         </div>
-        <!-- Nút ton-connect -->
-    </header>
-    
-
-    <div class="table-container">
-        <table>
-            <tbody>
-                <tr>
-                    <td class="logo"><img src="/logo-coin/IMG_20241108_121723_913.jpg" alt="Vertus Logo"></td>
-                    <td>$UN</td>
-                    <td class="countdown-time" data-time="2025-06-01T13:00:00Z">Loading...</td>
-                    <td><a href="https://t.me/UnichAirdropBot/start" class="action-btn">Claim 50 FD</a></td>
-                </tr>
-                <tr>
-                    <td class="logo"><img src="/logo-coin/trs.jpg" alt="Vertus Logo"></td>
-                    <td>TREASURY</td>
-                    <td class="countdown-time" data-time="2025-03-28T13:00:00Z">Loading...</td>
-                    <td><a href="https://t.me/treasury_official_bot/app?startapp=5387725104" class="action-btn">Start</a></td>
-                </tr>
-
-
-                <tr>
-                    <td class="logo"><img src="/logo-coin/3.jpg" alt="Wcoin Logo"></td>
-                    <td>$WCOIN</td>
-                    <td class="countdown-time" data-time="2025-04-29T12:00:00Z">Loading...</td>
-                    <td><a href="https://t.me/wcoin_tapbot/wcoin_app?startapp=NTM4NzcyNTEwNA==" class="action-btn">Start</a></td>
-                </tr>
-                <tr>
-                    <td class="logo"><img src="/logo-coin/22.jpg" alt="Wcoin Logo"></td>
-                    <td>$FLIX</td>
-                    <td class="countdown-time" data-time="2025-03-25T12:00:00Z">Loading...</td>
-                    <td><a href="https://t.me/W3BFLIXBot?start=iv2ac3fc1201" class="action-btn">Start</a></td>
-                </tr>
-                
-                <tr>
-                    <td class="logo"><img src="/logo-coin/14.jpg" alt="Wcoin Logo"></td>
-                    <td>$SWITCH</td>
-                    <td class="countdown-time" data-time="2025-04-10T12:00:00Z">Loading...</td>
-                    <td><a href="https://t.me/pocketfi_bot/Mining?startapp=5387725104" class="action-btn">Start</a></td>
-                </tr>
-                <tr>
-                    <td class="logo"><img src="/logo-coin/token.gif" alt=" Logo"></td>
-                    <td>$AGO</td>
-                    <td class="countdown-time" data-time="2025-02-15T12:00:00Z">Loading...</td>
-                    <td><a href="https://t.me/HexacoinBot/wallet?startapp=5387725104" class="action-btn">Start</a></td>
-                </tr>
-                <tr>
-                    <td class="logo"><img src="/logo-coin/photo_5230958794740198125_c.jpg" alt="Vertus Logo"></td>
-                    <td>$CAPS</td>
-                    <td class="countdown-time" data-time="2025-02-02T17:00:00Z">Loading...</td>
-                    <td><a href="https://t.me/DurovCapsBot/caps?startapp=5387725104" class="action-btn">Start</a></td>
-                </tr>
-
-                <tr>
-                    <td class="logo"><img src="/logo-coin/7.jpg" alt="Yescoin Logo"></td>
-                    <td>$YES</td>
-                    <td class="countdown-time" data-time="2025-01-01T00:00:00Z">Snapshot 1/3</td>
-                    <td><a href="https://t.me/yescoin_officialbot/app?startapp=v1_prize_ZdaoFU" class="action-btn">Start</a></td>
-                </tr>
-                <tr>
-                    <td class="logo"><img src="/logo-coin/1.jpg" alt="Cexp Logo"></td>
-                    <td>$CEXP</td>
-                    <td class="countdown-time" data-time="2025-01-01T00:00:00Z">Snapshot Success</td>
-                    <td><a href="https://t.me/cexio_tap_bot?start=1716270247286630" class="action-btn">Start</a></td>
-                </tr>
-
-            </tbody>
-        </table>
-    </div>
-
-  
-
-    
-
-
-    
-    
-    <div class="app-category">
-        <h2>Favourite ❤️</h2>
-        <div id="favorite-apps" class="menu"></div> <!-- Danh sách yêu thích -->
-    </div>
-    <div class="app-category">
-        <h2>Q1 2025🔥</h2>
-        <div class="menu">
-           
-            <div class="app"><a href="https://t.me/realyescoinbot?start=r_5387725104"><img src="/logo-coin/5.jpg" alt="App 19"></a><span>YT <i class="heart" data-app="17">♡</i></span></div>
-            <div class="app"><a href="https://t.me/dormint_bot?start=5387725104"><img src="/logo-coin/23.jpg" alt="App 34"></a><span>DM <i class="heart" data-app="32">♡</i></span></div>
-
+        <div class="app" onclick="openApp('https://t.me/wcoin_tapbot/wcoin_app?startapp=NTM4NzcyNTEwNA==')">
+          <img src="/logo-coin/3.jpg" />
+          <span>$WCOIN</span>
         </div>
-    </div>
-
-
-
-    
-    <div class="app-category">
-        <h2>Trending App🔥</h2>
-        <div class="menu">
-            <div class="app"><a href="https://t.me/repcoinbot/rep?startapp=rep_5387725104"><img src="/logo-coin/rep.jpg" alt="App 3"></a><span>REP <i class="heart" data-app="101">♡</i></span></div>
-            
-            <div class="app"><a href="http://t.me/BlumCryptoBot/app?startapp=ref_Sn8ogL25Ap"><img src="/logo-coin/12.jpg" alt="App 3"></a><span>BLUM <i class="heart" data-app="03">♡</i></span></div>
-            <div class="app"><a href="https://t.me/tonxdao_bot?start=ref_5387725104"><img src="/logo-coin/txd.jpg" alt="App 8"></a><span>TXD <i class="heart" data-app="41">♡</i></span></div>
-            <div class="app"><a href="https://t.me/UnichAirdropBot/start"><img src="/logo-coin/IMG_20241108_121723_913.jpg" alt="App 2"></a><span>UN <i class="heart" data-app="73">♡</i></span></div>           
-
+        <div class="app" onclick="openApp('https://t.me/treasury_official_bot/app?startapp=5387725104')">
+          <img src="/logo-coin/trs.jpg" />
+          <span>$TREA</span>
         </div>
-    </div>
-
-
-
-
-    <div class="app-category">
-        <h2>Seeson 2 🕹️</h2>
-        <div class="menu">
-            <div class="app"><a href="https://t.me/tonstationgames_bot/app?startapp=ref_vyjqderh4emwxsssun3hza"><img src="/logo-coin/20.jpg" alt="App 32"></a><span>SS2</span></div>
-            <div class="app"><a href="https://t.me/hamster_kombat_bot?start=kentId5387725104"><img src="/logo-coin/10.jpg" alt="App 23"></a><span>SS2</span></div>
-            <div class="app"><a href="https://t.me/onus_tap_tap_tap_bot?start=1724845989868"><img src="/logo-coin/19.jpg" alt="App 30"></a><span>SS2</span></div>
-            <div class="app"><a href="http://t.me/vertus_app_bot/app?startapp=5387725104"><img src="/logo-coin/8.jpg" alt="App 30"></a><span>SS2</span></div>
-            <div class="app"><a href="https://t.me/tapswap_mirror_bot?start=r_5387725104"><img src="/logo-coin/9.jpg" alt="App 30"></a><span>SS2</span></div>
-
+        <div class="app" onclick="openApp('https://t.me/W3BFLIXBot?start=iv2ac3fc1201')">
+          <img src="/logo-coin/22.jpg" />
+          <span>$FLIX</span>
         </div>
-        
-    </div>
-
-
-
-    
-
-        <div class="app-category">
-        <h2>New App ✨</h2>
-        <div class="menu">
-            <!-- 15 ứng dụng trong mục Trending -->
-            <div class="app"><a href="https://t.me/drops/app?startapp=ref_BTFPO"><img src="/logo-coin/dropbot.jpg" alt="App 1"></a><span>DR <i class="heart" data-app="75">♡</i></span></div>
-            <div class="app"><a href="https://t.me/rating/app?startapp=ref_4b65465387725104"><img src="/logo-coin/rating.jpg" alt="App 1"></a><span>RT <i class="heart" data-app="74">♡</i></span></div>
-            <div class="app"><a href="https://t.me/WontonOrgBot/gameapp?startapp=referralCode=I7HQOXXI"><img src="/logo-coin/wt.jpg" alt="App 1"></a><span>WTON <i class="heart" data-app="09">♡</i></span></div>
-           
-        </div>
+        <div class="app" onclick="openApp('https://t.me/pocketfi_bot/Mining?startapp=5387725104')">
+          <img src="/logo-coin/14.jpg" />
+          <span>$SW</span>
         </div>
 
-    <div class="app-category">
-        <h2>Generally 🕹️</h2>
-        <div class="menu">
-            <div class="app"><a href="https://t.me/skate_app_bot?start=5w2G5b"><img src="/logo-coin/IMG_20241103_162332_342.jpg" alt="App 1"></a><span>LP <i class="heart" data-app="72">♡</i></span></div>
-
-            
-            
-            <div class="app"><a href="https://t.me/codexfieldbot/wallet?startapp=RF689Doj85mU"><img src="/logo-coin/cf.jpg" alt="App 3"></a><span>CF <i class="heart" data-app="62">♡</i></span></div>
-            <div class="app"><a href="https://t.me/TsubasaRivalsBot/start?startapp=inviter_id-5387725104"><img src="/logo-coin/ct.jpg" alt="App 7"></a><span>CT <i class="heart" data-app="63">♡</i></span></div>
-            <div class="app"><a href="https://t.me/krypton_game_bot/app?startapp=v0_rX5CF1p_guXTPhX"><img src="/logo-coin/kr.jpg" alt="App 64"></a><span>KR <i class="heart" data-app="10">♡</i></span></div>
-
-            <div class="app"><a href="https://t.me/trikonbot/game?startapp=w94cbjy6"><img src="/logo-coin/tk.jpg" alt="App 3"></a><span>TK <i class="heart" data-app="66">♡</i></span></div>
-            <div class="app"><a href="https://t.me/tomowalletbot/tomo_wallet_app?startapp=VASRDHI3DQ"><img src="/logo-coin/tm.jpg" alt="App 7"></a><span>TM <i class="heart" data-app="67">♡</i></span></div>
-            
-            <div class="app"><a href="https://t.me/Binance_Moonbix_bot/start?startapp=ref_5387725104&startApp=ref_5387725104"><img src="/logo-coin/bnbmb.jpg" alt="App 4"></a><span>BNB <i class="heart" data-app="04">♡</i></span></div>
-            <div class="app"><a href="https://t.me/OKX_official_bot/OKX_Racer?startapp=linkCode_24237303"><img src="/logo-coin/race.jpg" alt="App 6"></a><span>OKX <i class="heart" data-app="5">♡</i></span></div>
-            <div class="app"><a href="https://t.me/xkucoinbot/kucoinminiapp?startapp=cm91dGU9JTJGdGFwLWdhbWUlM0ZpbnZpdGVyVXNlcklkJTNENTM4NzcyNTEwNCUyNnJjb2RlJTNEUUJBRVFFMUw="><img src="/logo-coin/kucoinx.jpg" alt="6"></a><span>KC <i class="heart" data-app="06">♡</i></span></div>
-           
-            <!-- 27 ứng dụng trong mục Hay Dùng -->
-            <div class="app"><a href="https://t.me/coub/app?startapp=coub__marker_19934812/"><img src="/logo-coin/IMG_20240930_101421_266.jpg" alt="App 3"></a><span>COUB <i class="heart" data-app="08">♡</i></span></div>
-            
-            <div class="app"><a href="https://t.me/walbi_ala_bot/walbi?startapp=Y29kZT1jNTI2YjImZGxfaWQ9cmVmZXJyYWxDb2Rl"><img src="/logo-coin/IMG_20240930_102758_160.jpg" alt="App 3"></a><span>PTS <i class="heart" data-app="10">♡</i></span></div>
-            <div class="app"><a href="https://t.me/fastmintapp_bot?start=5387725104"><img src="/logo-coin/IMG_20240930_102622_677.jpg" alt="App 7"></a><span>MT <i class="heart" data-app="11">♡</i></span></div>
-            <div class="app"><a href="https://t.me/birdx2_bot/birdx?startapp=5387725104"><img src="/logo-coin/birds.jpg" alt="App 3"></a><span>BIRD <i class="heart" data-app="12">♡</i></span></div>
-           
-            <div class="app"><a href="https://t.me/TheWhaleAppBot?start=r_5387725104"><img src="/logo-coin/wxw.jpg" alt="App "></a><span>WXW <i class="heart" data-app="61">♡</i></span></div>
-            
-            
-            
-            
-            <div class="app"><a href="https://t.me/quackquack_game_bot?start=?start=4orpdv6clD"><img src="/logo-coin/4.jpg" alt="App 18"></a><span>Q <i class="heart" data-app="16">♡</i></span></div>
-         
-            <div class="app"><a href="https://t.me/dotcoin_bot?start=r_5387725104"><img src="/logo-coin/6.jpg" alt="App 20"></a><span>DTC <i class="heart" data-app="18">♡</i></span></div>
-           
-            
-           
-            <div class="app"><a href="https://t.me/Shuttle_ton_bot?start=r_5387725104"><img src="/logo-coin/11.jpg" alt="App 24"></a><span>ST <i class="heart" data-app="22">♡</i></span></div>
-           
-            
-            <div class="app"><a href="https://t.me/MatchQuestBot/start?startapp=eb6abff2544f765bf5bdb3620b612abd"><img src="/logo-coin/15.jpg" alt="App 27"></a><span>MAT <i class="heart" data-app="25">♡</i></span></div>
-            <div class="app"><a href="https://t.me/TimeFarmCryptoBot?start=jnFA1i1f9Xms6E19"><img src="/logo-coin/16.jpg" alt="App 28"></a><span>TF <i class="heart" data-app="26">♡</i></span></div>
-            <div class="app"><a href="http://t.me/IcebergAppBot?start=referral_5387725104"><img src="/logo-coin/17.jpg" alt="App 29"></a><span>ICE <i class="heart" data-app="27">♡</i></span></div>
-
-           
-
-            <div class="app"><a href="https://t.me/Mdaowalletbot?start=5387725104"><img src="/logo-coin/21.jpg" alt="App 33"></a><span>MD <i class="heart" data-app="31">♡</i></span></div>
-
-            <div class="app"><a href="https://t.me/boom?start=MUnNNVPPWLQ5aYt6k6jQou"><img src="/logo-coin/28.jpg" alt="App 35"></a><span>BM <i class="heart" data-app="33">♡</i></span></div>
-            <div class="app"><a href="https://t.me/graph_dex_bot?start=5387725104"><img src="/logo-coin/27.jpg" alt="App 8"></a><span>GR <i class="heart" data-app="34">♡</i></span></div>
-            <div class="app"><a href="https://t.me/cryptorank_app_bot/points?startapp=ref_5387725104_"><img src="/logo-coin/25.jpg" alt="App 9"></a><span>CR <i class="heart" data-app="35">♡</i></span></div>
-            <div class="app"><a href="https://fintop.io/6nBvAHD"><img src="/logo-coin/hold.jpg" alt="App 11"></a><span>HOLD <i class="heart" data-app="App 11">♡</i></span></div>
-            <div class="app"><a href="http://t.me/hexn_bot/app?startapp=74cc92cc-1c10-4044-8048-1dbabbc02a88"><img src="/logo-coin/30.jpg" alt="App 12"></a><span>HEXN <i class="heart" data-app="37">♡</i></span></div>
-            <div class="app"><a href="https://t.me/DejenDogBot?start=2dcfebaf"><img src="/logo-coin/32.jpg" alt="App 13"></a><span>DjD <i class="heart" data-app="38">♡</i></span></div>
-            <div class="app"><a href="https://t.me/MMproBump_bot?start=ref_5387725104"><img src="/logo-coin/IMG_20240929_194018_843.jpg" alt="App 14"></a><span>MMB <i class="heart" data-app="39">♡</i></span></div>
-            <div class="app"><a href="https://t.me/Agent301Bot/app?startapp=onetime5387725104"><img src="/logo-coin/301.jpg" alt="App 15"></a><span>301 <i class="heart" data-app="40">♡</i></span></div>
-            
-            <div class="app"><a href="https://t.me/bwcwukong_bot/Play?startapp=5387725104"><img src="/logo-coin/bwc.jpg" alt="App 9"></a><span>BWC <i class="heart" data-app="42">♡</i></span></div>
-            <div class="app"><a href="https://t.me/NotBoredPuppies_bot?start=r_5387725104"><img src="/logo-coin/nbp.jpg" alt="App 10"></a><span>NBP <i class="heart" data-app="43">♡</i></span></div>
-            <div class="app"><a href="https://t.me/b_usersbot/join?startapp=ref-jUKQpUvcqtonEgaDDZdCbn"><img src="/logo-coin/bu.jpg" alt="App 11"></a><span>BU <i class="heart" data-app="44">♡</i></span></div>
-            <div class="app"><a href="https://t.me/Vanilla_Finance_Bot/Vanillafinance?startapp=inviteId10141498"><img src="/logo-coin/vani.jpg" alt="App 12"></a><span>VNF <i class="heart" data-app="45">♡</i></span></div>
-            
-            
-          
+        <div class="app" onclick="openApp('https://t.me/yescoin_officialbot/app?startapp=v1_prize_ZdaoFU')">
+          <img src="/logo-coin/7.jpg" />
+          <span>$YES</span>
         </div>
-    </div>
-
-
-
-
-
-
-        <div class="app-category">
-        <h2>Node 🍒</h2>
-        <div class="menu">
-            <!-- 5 ứng dụng trong mục Khác -->
-            <div class="app"><a href="https://app.getgrass.io/register?referralCode=5yo2PXUceljS4Ii"><img src="/logo-coin/grass.jpg" alt="Loading"></a><span>Grass</span></div>
-            <div class="app"><a href="/dawn.html"><img src="/logo-coin/dawn.jpg" alt="Loading"></a><span>Dawn</span></div>
-          
+        <div class="app" onclick="openApp('https://t.me/cexio_tap_bot?start=1716270247286630')">
+          <img src="/logo-coin/1.jpg" />
+          <span>$CEX</span>
         </div>
+        <div class="app" onclick="openApp('https://t.me/dormint_bot?start=5387725104')">
+          <img src="/logo-coin/23.jpg" />
+          <span>$DORM</span>
+        </div>
+      </div>
+
+
+
+
+
+
+      <h3 class="centered-title">Đang phát triển</h3>
+      <div class="app-menu">
+        <div class="app" onclick="openApp('https://t.me/treasury_official_bot/app?startapp=5387725104')">
+          <img src="/logo-coin/token.gif" />
+          <span>$AGO</span>
+        </div>
+        <div class="app" onclick="openApp('https://t.me/DurovCapsBot/caps?startapp=5387725104')">
+          <img src="/logo-coin/photo_5230958794740198125_c.jpg" />
+          <span>$CAP</span>
+        </div>
+        <div class="app" onclick="openApp('https://t.me/realyescoinbot?start=r_5387725104')">
+          <img src="/logo-coin/5.jpg" />
+          <span>$YES</span>
+        </div>
+
+        <div class="app" onclick="openApp('https://t.me/repcoinbot/rep?startapp=rep_5387725104')">
+          <img src="/logo-coin/rep.jpg"/>
+          <span>$REP</span>
+        </div>
+        <div class="app" onclick="openApp('http://t.me/BlumCryptoBot/app?startapp=ref_Sn8ogL25Ap')">
+          <img src="/logo-coin/12.jpg" />
+          <span>$BLUM</span>
+        </div>
+        <div class="app" onclick="openApp('https://t.me/tonxdao_bot?start=ref_5387725104')">
+          <img src="/logo-coin/txd.jpg" />
+          <span>$TONX</span>
         </div>
 
 
 
-    
-        
-
-    
-    <div class="app-category">
-        <h2>Exchange 🪙</h2>
-        <div class="menu">
-            <!-- 5 ứng dụng trong mục Khác 2 -->
-            <div class="app"><a href="https://www.binance.info/vi/activity/referral-entry/CPA/together-v3?ref=CPA_00N60370DE"><img src="/logo-coin/Binance-Logo.jpg" alt="App 56"></a><span>BINANCE</span></div>
-            <div class="app"><a href="https://okx.com/join/94425783"><img src="/logo-coin/okx.jpg" alt="App 57"></a><span>OKX</span></div>
-            <div class="app"><a href="https://www.bybitglobal.com/invite?ref=4K7A14M"><img src="/logo-coin/bybitx.png" alt="App 58"></a><span>BYBIT</span></div>
-            <div class="app"><a href="https://share.bitget.com/u/Y1TJB7JX"><img src="/logo-coin/bitget.jpg" alt="App 59"></a><span>BITGET</span></div>
-            <div class="app"><a href="https://www.gate.io/signup/AVLMVF0O?ref_type=103"><img src="/logo-coin/gate.jpg" alt="App 60"></a><span>GATE</span></div>
-        </div>
-    </div>
-
-
-
-    <div class="app-category">
-        <h2>Listed</h2>
-        <div class="menu">
-            <!-- 5 ứng dụng trong mục Khác 2 -->
-            <div class="app"><a> <img src="/logo-coin/2.jpg" alt="App 1"></a><span>SEED</span></div>
-            <div class="app"><a> <img src="/logo-coin/paws.jpg" alt="App 1"></a><span>PAWS</span></div>
-            <div class="app"><a> <img src="/logo-coin/dc.jpg" alt="App 1"></a><span>DUCK</span></div>
-            <div class="app"><a> <img src="/logo-coin/IMG_20240930_101506_596.jpg" alt="App 1"></a><span>CLAY</span></div>
-            <div class="app"><a> <img src="/logo-coin/IMG_20241027_235701_441.jpg" alt="App 1"></a><span>OGC</span></div>
-            <div class="app"><a><img src="/logo-coin/vana.jpg" alt="App 14"></a><span>VN</span></div>            
-            <div class="app"><a><img src="/logo-coin/10.jpg" alt="App"></a><span>HMSTR</span></div>
-            <div class="app"><a><img src="/logo-coin/fixel.jpg" alt="App"></a><span>PX</span></div> 
-            <div class="app"><a><img src="/logo-coin/dogs.jpg" alt="App"></a><span>DOGS</span></div>
-            <div class="app"><a><img src="/logo-coin/cati.jpg" alt="App"></a><span>CATI</span></div>
-            <div class="app"><a><img src="/logo-coin/major.jpg" alt="App"></a><span>MAJOR</span></div>
-            <div class="app"><a><img src="/logo-coin/x.jpg" alt="App"></a><span>X</span></div>
-            <div class="app"><a><img src="/logo-coin/toma.jpg" alt="App"></a><span>TOMA</span></div>
-            <div class="app"><a><img src="/logo-coin/arix.jpg" alt="App"></a><span>ARIX</span></div>  
-            <div class="app"><a><img src="/logo-coin/pingo.jpg" alt="App 7"></a><span>PG</span></div>
-            <div class="app"><a><img src="/logo-coin/pe.jpg" alt="App 7"></a><span>PYE</span></div>
-        </div>
-    </div>
-
-
-
-
-    
-
-
-    
-<div class="marquee-container">
-    <div class="marquee-content">
-        <span>Trang web sẽ bảo trì vào ngày 15/5/2025.</span>
-    </div>
+        <div class="app" onclick="openApp('https://t.me/drops/app?startapp=ref_BTFPO')">
+  <img src="/logo-coin/dropbot.jpg" />
+  <span>$DR</span>
 </div>
 
+<div class="app" onclick="openApp('https://t.me/rating/app?startapp=ref_4b65465387725104')">
+  <img src="/logo-coin/rating.jpg" />
+  <span>$RT</span>
+</div>
+
+<div class="app" onclick="openApp('https://t.me/WontonOrgBot/gameapp?startapp=referralCode=I7HQOXXI')">
+  <img src="/logo-coin/wt.jpg" />
+  <span>$WTON</span>
+</div>
+
+<div class="app" onclick="openApp('https://t.me/skate_app_bot?start=5w2G5b')">
+  <img src="/logo-coin/IMG_20241103_162332_342.jpg" />
+  <span>$LP</span>
+</div>
+
+<div class="app" onclick="openApp('https://t.me/codexfieldbot/wallet?startapp=RF689Doj85mU')">
+  <img src="/logo-coin/cf.jpg" />
+  <span>$CF</span>
+</div>
+
+<div class="app" onclick="openApp('https://t.me/TsubasaRivalsBot/start?startapp=inviter_id-5387725104')">
+  <img src="/logo-coin/ct.jpg" />
+  <span>$CT</span>
+</div>
+
+<div class="app" onclick="openApp('https://t.me/krypton_game_bot/app?startapp=v0_rX5CF1p_guXTPhX')">
+  <img src="/logo-coin/kr.jpg" />
+  <span>$KR</span>
 </div>
 
 
-    
-    <!-- LINK FONT AWESOME -->
+
+
+
+
+
+
+
+<div class="app" onclick="openApp('https://t.me/trikonbot/game?startapp=w94cbjy6')">
+  <img src="/logo-coin/tk.jpg" />
+  <span>$TK</span>
+</div>
+
+<div class="app" onclick="openApp('https://t.me/tomowalletbot/tomo_wallet_app?startapp=VASRDHI3DQ')">
+  <img src="/logo-coin/tm.jpg" />
+  <span>$TM</span>
+</div>
+
+<div class="app" onclick="openApp('https://t.me/Binance_Moonbix_bot/start?startapp=ref_5387725104&startApp=ref_5387725104')">
+  <img src="/logo-coin/bnbmb.jpg" />
+  <span>$BNB</span>
+</div>
+
+<div class="app" onclick="openApp('https://t.me/OKX_official_bot/OKX_Racer?startapp=linkCode_24237303')">
+  <img src="/logo-coin/race.jpg" />
+  <span>$OKX</span>
+</div>
+
+<div class="app" onclick="openApp('https://t.me/xkucoinbot/kucoinminiapp?startapp=cm91dGU9JTJGdGFwLWdhbWUlM0ZpbnZpdGVyVXNlcklkJTNENTM4NzcyNTEwNCUyNnJjb2RlJTNEUUJBRVFFMUw=')">
+  <img src="/logo-coin/kucoinx.jpg" />
+  <span>$KC</span>
+</div>
+
+<div class="app" onclick="openApp('https://t.me/coub/app?startapp=coub__marker_19934812/')">
+  <img src="/logo-coin/IMG_20240930_101421_266.jpg" />
+  <span>$COUB</span>
+</div>
+
+<div class="app" onclick="openApp('https://t.me/walbi_ala_bot/walbi?startapp=Y29kZT1jNTI2YjImZGxfaWQ9cmVmZXJyYWxDb2Rl')">
+  <img src="/logo-coin/IMG_20240930_102758_160.jpg" />
+  <span>$PTS</span>
+</div>
+
+<div class="app" onclick="openApp('https://t.me/fastmintapp_bot?start=5387725104')">
+  <img src="/logo-coin/IMG_20240930_102622_677.jpg" />
+  <span>$MT</span>
+</div>
+
+<div class="app" onclick="openApp('https://t.me/birdx2_bot/birdx?startapp=5387725104')">
+  <img src="/logo-coin/birds.jpg" />
+  <span>$BIRD</span>
+</div>
+
+
+<div class="app" onclick="openApp('https://t.me/quackquack_game_bot?start=?start=4orpdv6clD')">
+  <img src="/logo-coin/4.jpg" />
+  <span>$Q</span>
+</div>
+
+<div class="app" onclick="openApp('https://t.me/dotcoin_bot?start=r_5387725104')">
+  <img src="/logo-coin/6.jpg" />
+  <span>$DTC</span>
+</div>
+
+<div class="app" onclick="openApp('https://t.me/Shuttle_ton_bot?start=r_5387725104')">
+  <img src="/logo-coin/11.jpg" />
+  <span>$ST</span>
+</div>
+
+<div class="app" onclick="openApp('https://t.me/MatchQuestBot/start?startapp=eb6abff2544f765bf5bdb3620b612abd')">
+  <img src="/logo-coin/15.jpg" />
+  <span>$MAT</span>
+</div>
+
+<div class="app" onclick="openApp('https://t.me/TimeFarmCryptoBot?start=jnFA1i1f9Xms6E19')">
+  <img src="/logo-coin/16.jpg" />
+  <span>$TF</span>
+</div>
+
+<div class="app" onclick="openApp('http://t.me/IcebergAppBot?start=referral_5387725104')">
+  <img src="/logo-coin/17.jpg" />
+  <span>$ICE</span>
+</div>
+
+<div class="app" onclick="openApp('https://t.me/Mdaowalletbot?start=5387725104')">
+  <img src="/logo-coin/21.jpg" />
+  <span>$MD</span>
+</div>
+
+<div class="app" onclick="openApp('https://t.me/boom?start=MUnNNVPPWLQ5aYt6k6jQou')">
+  <img src="/logo-coin/28.jpg" />
+  <span>$BM</span>
+</div>
+
+<div class="app" onclick="openApp('https://t.me/graph_dex_bot?start=5387725104')">
+  <img src="/logo-coin/27.jpg" />
+  <span>$GR</span>
+</div>
+
+<div class="app" onclick="openApp('https://t.me/cryptorank_app_bot/points?startapp=ref_5387725104_')">
+  <img src="/logo-coin/25.jpg" />
+  <span>$CR</span>
+</div>
+
+<div class="app" onclick="openApp('https://fintop.io/6nBvAHD')">
+  <img src="/logo-coin/hold.jpg" />
+  <span>$HOLD</span>
+</div>
+
+<div class="app" onclick="openApp('http://t.me/hexn_bot/app?startapp=74cc92cc-1c10-4044-8048-1dbabbc02a88')">
+  <img src="/logo-coin/30.jpg" />
+  <span>$HEXN</span>
+</div>
+
+<div class="app" onclick="openApp('https://t.me/DejenDogBot?start=2dcfebaf')">
+  <img src="/logo-coin/32.jpg" />
+  <span>$DjD</span>
+</div>
+
+<div class="app" onclick="openApp('https://t.me/MMproBump_bot?start=ref_5387725104')">
+  <img src="/logo-coin/IMG_20240929_194018_843.jpg" />
+  <span>$MMB</span>
+</div>
+
+<div class="app" onclick="openApp('https://t.me/Agent301Bot/app?startapp=onetime5387725104')">
+  <img src="/logo-coin/301.jpg" />
+  <span>$301</span>
+</div>
+
+<div class="app" onclick="openApp('https://t.me/bwcwukong_bot/Play?startapp=5387725104')">
+  <img src="/logo-coin/bwc.jpg" />
+  <span>$BWC</span>
+</div>
+
+<div class="app" onclick="openApp('https://t.me/NotBoredPuppies_bot?start=r_5387725104')">
+  <img src="/logo-coin/nbp.jpg" />
+  <span>$NBP</span>
+</div>
+
+
+<div class="app" onclick="openApp('https://t.me/Vanilla_Finance_Bot/Vanillafinance?startapp=inviteId10141498')">
+  <img src="/logo-coin/vani.jpg" />
+  <span>$VNF</span>
+</div>
+
+ </div>
+
+
+<h3 class="centered-title">Mùa 2</h3>
+      <div class="app-menu">
+<div class="app" onclick="openApp('https://t.me/tonstationgames_bot/app?startapp=ref_vyjqderh4emwxsssun3hza')">
+  <img src="/logo-coin/20.jpg" />
+  <span>SS2</span>
+</div>
+
+<div class="app" onclick="openApp('https://t.me/hamster_kombat_bot?start=kentId5387725104')">
+  <img src="/logo-coin/10.jpg" />
+  <span>SS2</span>
+</div>
+
+<div class="app" onclick="openApp('https://t.me/onus_tap_tap_tap_bot?start=1724845989868')">
+  <img src="/logo-coin/19.jpg" />
+  <span>SS2</span>
+</div>
+
+<div class="app" onclick="openApp('http://t.me/vertus_app_bot/app?startapp=5387725104')">
+  <img src="/logo-coin/8.jpg" />
+  <span>SS2</span>
+</div>
+
+<div class="app" onclick="openApp('https://t.me/tapswap_mirror_bot?start=r_5387725104')">
+  <img src="/logo-coin/9.jpg" />
+  <span>SS2</span>
+</div>
+      </div>
+
+
+      <h3 class="centered-title">Sàn Giao Dịch</h3>
+      <div class="app-menu">
+<div class="app">
+  <a href="https://www.binance.info/vi/activity/referral-entry/CPA/together-v3?ref=CPA_00N60370DE" target="_blank" rel="noopener noreferrer">
+    <img src="/logo-coin/Binance-Logo.jpg" alt="App 56" />
+  </a>
+  <span>$BNB</span>
+</div>
+
+<div class="app">
+  <a href="https://okx.com/join/94425783" target="_blank" rel="noopener noreferrer">
+    <img src="/logo-coin/okx.jpg" alt="App 57" />
+  </a>
+  <span>$OKB</span>
+</div>
+
+<div class="app">
+  <a href="https://www.bybitglobal.com/invite?ref=4K7A14M" target="_blank" rel="noopener noreferrer">
+    <img src="/logo-coin/bybitx.png" alt="App 58" />
+  </a>
+  <span>$BYBIT</span>
+</div>
+
+<div class="app">
+  <a href="https://share.bitget.com/u/Y1TJB7JX" target="_blank" rel="noopener noreferrer">
+    <img src="/logo-coin/bitget.jpg" alt="App 59" />
+  </a>
+  <span>$BGB</span>
+</div>
+
+<div class="app">
+  <a href="https://www.gate.io/signup/AVLMVF0O?ref_type=103" target="_blank" rel="noopener noreferrer">
+    <img src="/logo-coin/gate.jpg" alt="App 60" />
+  </a>
+  <span>$GATE</span>
+</div>
+</div>
+
+
+
+
+      <h3 class="centered-title">Đã Niêm Yết</h3>
+      <div class="app-menu">
+<!-- 5 ứng dụng trong mục Khác 2 -->
+<div class="app"><a><img src="/logo-coin/2.jpg" alt="App 1"></a><span>$SEED</span></div>
+<div class="app"><a><img src="/logo-coin/paws.jpg" alt="App 1"></a><span>$PAWS</span></div>
+<div class="app"><a><img src="/logo-coin/dc.jpg" alt="App 1"></a><span>$DUCK</span></div>
+<div class="app"><a><img src="/logo-coin/IMG_20240930_101506_596.jpg" alt="App 1"></a><span>$CLAY</span></div>
+<div class="app"><a><img src="/logo-coin/IMG_20241027_235701_441.jpg" alt="App 1"></a><span>$OGC</span></div>
+<div class="app"><a><img src="/logo-coin/vana.jpg" alt="App 14"></a><span>$VN</span></div>            
+<div class="app"><a><img src="/logo-coin/10.jpg" alt="App"></a><span>$HMSTR</span></div>
+<div class="app"><a><img src="/logo-coin/fixel.jpg" alt="App"></a><span>$PX</span></div> 
+<div class="app"><a><img src="/logo-coin/dogs.jpg" alt="App"></a><span>$DOGS</span></div>
+<div class="app"><a><img src="/logo-coin/cati.jpg" alt="App"></a><span>$CATI</span></div>
+<div class="app"><a><img src="/logo-coin/major.jpg" alt="App"></a><span>$MAJOR</span></div>
+<div class="app"><a><img src="/logo-coin/x.jpg" alt="App"></a><span>$X</span></div>
+<div class="app"><a><img src="/logo-coin/toma.jpg" alt="App"></a><span>$TOMA</span></div>
+<div class="app"><a><img src="/logo-coin/arix.jpg" alt="App"></a><span>$ARIX</span></div>  
+<div class="app"><a><img src="/logo-coin/pingo.jpg" alt="App 7"></a><span>$PG</span></div>
+<div class="app"><a><img src="/logo-coin/pe.jpg" alt="App 7"></a><span>$PYE</span></div>
+</div>
+
+
+
+
+
+
+
   <footer>
     <a href="/wallet/index.html" class="footer-item" data-page="wallet_new.html">
       <i class="fas fa-wallet"></i>
@@ -450,33 +656,154 @@ footer {
       <i class="fas fa-coins"></i> <!-- Biểu tượng Coins cho Jetton -->
       <span>Jetton</span>
     </a>
-    <a href="/main/index.html" class="footer-item" data-page="/main/index.html">
-      <i class="fas fa-th"></i>
-      <span>App</span>
-    </a>
-  
     <!-- Thêm Profile thay vì Home và Shop -->
     <a href="/profile/index.html" class="footer-item" data-page="profile.html">
       <i class="fas fa-user"></i>
       <span>Profile</span>
     </a>
-  
   </footer>
- 
- 
+
+  <script>
+    const currentPage = location.pathname.split("/").pop();
+    const items = document.querySelectorAll(".footer-item");
+    items.forEach(item => {
+      const page = item.getAttribute("data-page");
+      if (page === currentPage) {
+        item.classList.add("active");
+      }
+    });
+
+    let tg = window.Telegram?.WebApp;
+
+    function loadUserData() {
+      if (!tg) return;
+      tg.ready();
+      let user = tg.initDataUnsafe?.user;
+      if (user) {
+        document.getElementById("name").innerText = user.first_name + (user.last_name ? " " + user.last_name : "");
+        document.getElementById("username").innerText = user.username ? "@" + user.username : "Không có username";
+        document.getElementById("avatar").src = user.photo_url || "/logo-coin/bmweb.jpg";
+      }
+    }
+    window.onload = loadUserData;
+
+    function openApp(url) {
+      window.open(url, "_blank");
+    }
 
 
-    
-    
+  // Gọi khi người dùng bấm nút chuyển chế độ
+  function toggleDarkMode() {
+    document.body.classList.toggle("dark-mode");
+
+    // Lưu trạng thái vào localStorage
+    if (document.body.classList.contains("dark-mode")) {
+      localStorage.setItem("dark-mode", "enabled");
+    } else {
+      localStorage.setItem("dark-mode", "disabled");
+    }
+  }
+
+  // Khi trang tải lại, khôi phục trạng thái từ localStorage
+  window.addEventListener("DOMContentLoaded", () => {
+    if (localStorage.getItem("dark-mode") === "enabled") {
+      document.body.classList.add("dark-mode");
+    }
+  });
 
 
+    const connector = new TON_CONNECT_UI.TonConnectUI({
+      manifestUrl: "https://bmweb.site/tonconnect-manifest.json",
+      buttonRootId: "connect-wallet",
+    });
 
+    connector.onStatusChange(async (wallet) => {
+      if (wallet) {
+        const walletAddress = wallet.account.address;
+        document.getElementById("connect-only").style.display = "none";
+        document.getElementById("main-content").style.display = "block";
 
+        const walletAddressEl = document.getElementById("wallet-address");
+        walletAddressEl.textContent = walletAddress;
+        walletAddressEl.onclick = () => {
+          navigator.clipboard.writeText(walletAddress)
+            .then(() => alert("Đã sao chép địa chỉ ví!"))
+            .catch(() => alert("Sao chép thất bại."));
+        };
 
+        await loadFriendlyAddress(walletAddress);
+      } else {
+        document.getElementById("connect-only").style.display = "flex";
+        document.getElementById("main-content").style.display = "none";
+        document.getElementById("wallet-address").textContent = "Đang tải địa chỉ ví...";
+        document.getElementById("friendly-address").textContent = "Đang tải địa chỉ...";
+      }
+    });
 
-     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="/js/js.js"></script>
-    <script src="/main/main.js"></script>
-    <script src="/js/ton-connect.js"></script>
+async function loadFriendlyAddress(walletAddress) {
+  try {
+    const res = await fetch(`https://toncenter.com/api/v2/detectAddress?address=${walletAddress}`);
+    const detectData = await res.json();
+
+    if (detectData.ok && detectData.result) {
+      const friendlyAddr = detectData.result.non_bounceable.b64url;
+      const shortFriendly = `${friendlyAddr.slice(0, 10)}...${friendlyAddr.slice(-10)}`;
+
+      const friendlyEl = document.getElementById("friendly-address");
+      friendlyEl.textContent = shortFriendly;
+      friendlyEl.title = friendlyAddr;
+      friendlyEl.style.cursor = 'pointer';
+
+      friendlyEl.onclick = () => {
+        navigator.clipboard.writeText(friendlyAddr)
+          .then(() => {
+            Swal.fire({
+              icon: 'success',
+              title: 'Đã sao chép địa chỉ friendly!',
+              timer: 1500,
+              showConfirmButton: false,
+              toast: true,
+              position: 'top',
+              customClass: {
+                popup: 'custom-toast'
+              },
+              timerProgressBar: true,
+              didOpen: (toast) => {
+                toast.style.marginTop = '80px';
+              }
+            });
+          })
+          .catch(() => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Sao chép thất bại.',
+              timer: 1500,
+              showConfirmButton: false,
+              toast: true,
+              position: 'top',
+              customClass: {
+                popup: 'custom-toast'
+              },
+              timerProgressBar: true,
+              didOpen: (toast) => {
+                toast.style.marginTop = '80px';
+              }
+            });
+          });
+      };
+
+      const iconEl = document.getElementById("copy-friendly-icon");
+      if (iconEl) iconEl.onclick = friendlyEl.onclick;
+    } else {
+      document.getElementById("friendly-address").textContent = "Không thể lấy địa chỉ friendly.";
+    }
+  } catch (e) {
+    console.error("Lỗi khi gọi API detectAddress:", e);
+    document.getElementById("friendly-address").textContent = "Lỗi khi gọi API.";
+  }
+}
+
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
-</html>                                                                                
+</html>
