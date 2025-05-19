@@ -228,7 +228,10 @@
       margin-top: 5px;
       color: red;
     }
-    
+   .custom-toast {
+  border-radius: 25px !important;
+}
+ 
   </style>
 </head>
 <body>
@@ -431,10 +434,44 @@ async function loadFriendlyAddress(walletAddress) {
       const friendlyEl = document.getElementById("friendly-address");
       friendlyEl.textContent = shortFriendly;
       friendlyEl.title = friendlyAddr;
+      friendlyEl.style.cursor = 'pointer';
+
       friendlyEl.onclick = () => {
         navigator.clipboard.writeText(friendlyAddr)
-          .then(() => alert("Đã sao chép địa chỉ friendly!"))
-          .catch(() => alert("Sao chép thất bại."));
+          .then(() => {
+            Swal.fire({
+              icon: 'success',
+              title: 'Đã sao chép địa chỉ friendly!',
+              timer: 1500,
+              showConfirmButton: false,
+              toast: true,
+              position: 'top',
+              customClass: {
+                popup: 'custom-toast'
+              },
+              timerProgressBar: true,
+              didOpen: (toast) => {
+                toast.style.marginTop = '80px';
+              }
+            });
+          })
+          .catch(() => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Sao chép thất bại.',
+              timer: 1500,
+              showConfirmButton: false,
+              toast: true,
+              position: 'top',
+              customClass: {
+                popup: 'custom-toast'
+              },
+              timerProgressBar: true,
+              didOpen: (toast) => {
+                toast.style.marginTop = '80px';
+              }
+            });
+          });
       };
 
       const iconEl = document.getElementById("copy-friendly-icon");
@@ -449,5 +486,6 @@ async function loadFriendlyAddress(walletAddress) {
 }
 
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html>
