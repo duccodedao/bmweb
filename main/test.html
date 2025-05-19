@@ -351,9 +351,21 @@ items.forEach(item => {
 });
 
 
+const tg = Telegram.WebApp;
 
-        let tg = window.Telegram.WebApp;
+// Đánh dấu WebApp đã sẵn sàng (Telegram sẽ biết WebApp đã tải xong)
+tg.ready();
 
+// Hiển thị nút Back do Telegram cung cấp
+tg.BackButton.show();
+
+// Gắn sự kiện click vào nút Back, quay lại trang trước trong history
+tg.BackButton.onClick(() => window.history.back());
+
+// Lấy thông tin người dùng từ initDataUnsafe
+const user = tg.initDataUnsafe?.user;
+
+        
         function loadUserData() {
             tg.ready();
             let user = tg.initDataUnsafe.user;
