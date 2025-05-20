@@ -306,151 +306,123 @@ const itemHTML = `
 
 
 
+if (zeroBalanceJettons.length > 0) {
+  // Tổng giá trị tài sản = TON + Jettons
+  const allValueInUSDT = tonValueInUSDT + totalJettonValueInUSDT;
+  const allValueInVND = allValueInUSDT * usdtToVnd;
 
+  // *** Chèn đoạn mã tính phần trăm tăng/giảm ở đây ***
+  if (user?.username) {
+    const username = user.username;
+    const currentTimestamp = Date.now();
+    const currentValue = allValueInUSDT;
 
+    // Lấy dữ liệu cũ từ localStorage
+    const storageKey = `totalBalance_${username}`;
+    const oldData = JSON.parse(localStorage.getItem(storageKey));
 
- if (zeroBalanceJettons.length > 0) {
-    // Tổng giá trị tài sản = TON + Jettons
-    const allValueInUSDT = tonValueInUSDT + totalJettonValueInUSDT;
-    const allValueInVND = allValueInUSDT * usdtToVnd;
+    let percentChangeText = '';
+    if (oldData && oldData.timestamp) {
+      const hoursPassed = (currentTimestamp - oldData.timestamp) / (1000 * 60 * 60);
 
-
-
-
-
-
-
-// *** Chèn đoạn mã tính phần trăm tăng/giảm ở đây ***
-      if (user?.username) {
-        const username = user.username;
-        const currentTimestamp = Date.now();
-        const currentValue = allValueInUSDT;
-
-        // Lấy dữ liệu cũ từ localStorage
-        const storageKey = `totalBalance_${username}`;
-        const oldData = JSON.parse(localStorage.getItem(storageKey));
-
-        let percentChangeText = '';
-        if (oldData && oldData.timestamp) {
-          const hoursPassed = (currentTimestamp - oldData.timestamp) / (1000 * 60 * 60);
-
-          if (hoursPassed >= 24) {
-            const oldValue = oldData.value;
-            const change = ((currentValue - oldValue) / oldValue) * 100;
-            const sign = change >= 0 ? '+' : '';
-            percentChangeText = ` (24h: ${sign}${change.toFixed(2)}%)`;
-          }
-        }
-
-        // Cập nhật giao diện
-        const totalBalanceElement = document.querySelector('.total-asset .jetton-info p');
-        if (totalBalanceElement) {
-          totalBalanceElement.innerHTML += percentChangeText;
-        }
-
-        // Lưu lại dữ liệu mới
-        const newData = {
-          value: currentValue,
-          timestamp: currentTimestamp
-        };
-        localStorage.setItem(storageKey, JSON.stringify(newData));
+      if (hoursPassed >= 24) {
+        const oldValue = oldData.value;
+        const change = ((currentValue - oldValue) / oldValue) * 100;
+        const sign = change >= 0 ? '+' : '';
+        percentChangeText = ` (24h: ${sign}${change.toFixed(2)}%)`;
       }
+    }
 
-      // Hiển thị tổng giá trị tài sản
+    // Cập nhật giao diện
+    const totalBalanceElement = document.querySelector('.total-asset .jetton-info p');
+    if (totalBalanceElement) {
+      totalBalanceElement.innerHTML += percentChangeText;
+    }
 
+    // Lưu lại dữ liệu mới
+    const newData = {
+      value: currentValue,
+      timestamp: currentTimestamp
+    };
+    localStorage.setItem(storageKey, JSON.stringify(newData));
+  }
 
+  // Hiển thị tổng giá trị tài sản
+  const totalAssetHTML = `
+    <div class="jetton-item total-asset">
+      <div class="jetton-info">
+        <strong>Total Balance</strong>
 
+        <div id="friendly-address-wrapper">
+          <span id="friendly-address">Đang tải địa chỉ...</span>
+          <i id="copy-friendly-icon" class="fas fa-copy"></i>
+        </div>
 
-
-
-
-
-
-   
-const totalAssetHTML = `
-  <div class="jetton-item total-asset">
-    <div class="jetton-info">
-      <strong>Total Balance</strong>
-
-      <div id="friendly-address-wrapper">
-        <span id="friendly-address">Đang tải địa chỉ...</span>
-        <i id="copy-friendly-icon" class="fas fa-copy"></i>
+        <p>
+          ≈ $${allValueInUSDT.toLocaleString("en-US", { minimumFractionDigits: 2 })} ≈ 
+          ${allValueInVND.toLocaleString("vi-VN", { style: 'currency', currency: 'VND' })}
+        </p>
       </div>
-
-      <p>
-        ≈ $${allValueInUSDT.toLocaleString("en-US", { minimumFractionDigits: 2 })} ≈ 
-        ${allValueInVND.toLocaleString("vi-VN", { style: 'currency', currency: 'VND' })}
-      </p>
     </div>
-  </div>
-`;
-
-
-
-
+  `;
 
   list.innerHTML = totalAssetHTML + list.innerHTML; // ✅ Đặt ở đầu
 
+  async function loadFriendlyAddress() {
+    try {
+      const res = await fetch(`https://toncenter.com/api/v2/detectAddress?address=${walletAddress}`);
+      const detectData = await res.json();
 
+      if (detectData.ok && detectData.result) {
+        const friendlyAddr = detectData.result.non_bounceable.b64url;
+        const shortFriendly = `${friendlyAddr.slice(0,8)}...${friendlyAddr.slice(-8)}`;
+        document.getElementById("friendly-address").textContent = shortFriendly;
 
-async function loadFriendlyAddress() {
-  try {
-    const res = await fetch(`https://toncenter.com/api/v2/detectAddress?address=${walletAddress}`);
-    const detectData = await res.json();
-
-    if (detectData.ok && detectData.result) {
-      const friendlyAddr = detectData.result.non_bounceable.b64url;
-      const shortFriendly = `${friendlyAddr.slice(0,8)}...${friendlyAddr.slice(-8)}`;
-      document.getElementById("friendly-address").textContent = shortFriendly;
-
-      const copyFriendly = () => {
-        navigator.clipboard.writeText(friendlyAddr).then(() => {
-Swal.fire({
-  icon: 'success',
-  title: 'Đã sao chép!',
-  toast: true,
-  position: 'top-right',
-  timer: 2000,
-  showConfirmButton: false,
-  timerProgressBar: true,
-  padding: '10px 15px',
-  customClass: {
-    popup: 'swal2-toast-success',
-    title: 'swal2-toast-title'
-  }
-});
-        }).catch(() => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Thất bại',
-            toast: true,
-            position: 'top-right',
-            timer: 2000,
-            showConfirmButton: false,
-            timerProgressBar: true,
-            padding: '10px 15px',
-            customClass: {
-              popup: 'swal2-toast-error',
-              title: 'swal2-toast-title'
-            }
+        const copyFriendly = () => {
+          navigator.clipboard.writeText(friendlyAddr).then(() => {
+            Swal.fire({
+              icon: 'success',
+              title: 'Đã sao chép!',
+              toast: true,
+              position: 'top-right',
+              timer: 2000,
+              showConfirmButton: false,
+              timerProgressBar: true,
+              padding: '10px 15px',
+              customClass: {
+                popup: 'swal2-toast-success',
+                title: 'swal2-toast-title'
+              }
+            });
+          }).catch(() => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Thất bại',
+              toast: true,
+              position: 'top-right',
+              timer: 2000,
+              showConfirmButton: false,
+              timerProgressBar: true,
+              padding: '10px 15px',
+              customClass: {
+                popup: 'swal2-toast-error',
+                title: 'swal2-toast-title'
+              }
+            });
           });
-        });
-      };
+        };
 
-      document.getElementById("friendly-address").onclick = copyFriendly;
-      document.getElementById("copy-friendly-icon").onclick = copyFriendly;
-    } else {
-      document.getElementById("friendly-address").textContent = "Không thể lấy ví.";
+        document.getElementById("friendly-address").onclick = copyFriendly;
+        document.getElementById("copy-friendly-icon").onclick = copyFriendly;
+      } else {
+        document.getElementById("friendly-address").textContent = "Không thể lấy ví.";
+      }
+    } catch {
+      document.getElementById("friendly-address").textContent = "Lỗi API.";
     }
-  } catch {
-    document.getElementById("friendly-address").textContent = "Lỗi API.";
   }
-}
 
-loadFriendlyAddress();
-
-
-
+  loadFriendlyAddress();
 
   seeAllBtn.style.display = 'block';
   let expanded = false; // trạng thái xem danh sách đã mở chưa
@@ -467,14 +439,10 @@ loadFriendlyAddress();
     }
     expanded = !expanded;
   };
+} else {
+  console.log("Không có jetton với số dư bằng 0.");
 }
 
-
-  } catch (error) {
-    loadingSpinner.style.display = 'none';
-    console.error('ERROR', error);
-  }
-}
 
 
 
