@@ -26,6 +26,15 @@ zero-balance-list
 
 
 
+.percent-change {
+  font-size: 14px;
+  color: #4caf50; /* Màu xanh cho phần trăm tăng */
+  font-weight: bold;
+}
+
+.percent-change.negative {
+  color: #f44336; /* Màu đỏ cho phần trăm giảm */
+}
 
 
 
