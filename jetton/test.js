@@ -380,7 +380,6 @@ const totalAssetHTML = `
       <p>
         ≈ $${allValueInUSDT.toLocaleString("en-US", { minimumFractionDigits: 2 })} ≈ 
         ${allValueInVND.toLocaleString("vi-VN", { style: 'currency', currency: 'VND' })}
-        ${percentChangeText ? `<span class="percent-change">${percentChangeText}</span>` : ''}
       </p>
     </div>
   </div>
