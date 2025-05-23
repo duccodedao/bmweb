@@ -362,89 +362,163 @@ function toggleMemo(element) {
 
 
 
-  document.getElementById("send-ton-btn").addEventListener("click", async () => {
+
+
+
+
+
+
+
+
+
+
+
+
+document.getElementById("send-ton-btn").addEventListener("click", async () => {
     const toAddress = document.getElementById("to-address").value.trim();
     const amountTON = parseFloat(document.getElementById("ton-amount").value);
     const memo = document.getElementById("memo-text").value.trim();
-  
-    const maxAmount = parseFloat(document.getElementById("ton-amount").getAttribute("max"));
-  
+
+    // Giả sử maxAmount được lấy từ balanceTon, tương tự như đoạn mã thứ hai
+    // Bạn cần đảm bảo 'balanceTon' và các hàm 'truncateDecimal', 'formatNumberVietnamese', 
+    // 'convertRawAddressToB64url', 'truncateAddress' có sẵn hoặc tự định nghĩa.
+    const maxAmount = parseFloat(document.getElementById("ton-amount").getAttribute("max")); 
+
     if (!toAddress || isNaN(amountTON) || amountTON <= 0) {
-      Swal.fire({
-        icon: 'warning',
-        html: '<strong>Please enter a valid address and amount.</strong>',
-        position: 'top-right', // Popup hiển thị ở góc phải trên
-        toast: true, // Hiển thị dưới dạng toast
-        timer: 3000, // Tự động đóng sau 3 giây
-        showConfirmButton: false, // Không hiển thị nút xác nhận
-        padding: '10px', // Padding cho thông báo
-        customClass: {
-          popup: 'swal-popup-custom' // Thêm lớp tùy chỉnh cho popup
-        }
-      });
-      return;
+        Swal.fire({
+            icon: 'warning',
+            html: '<strong>Vui lòng nhập địa chỉ và số lượng hợp lệ.</strong>',
+            position: 'center', // Đã đổi từ 'top-right' sang 'center'
+            toast: false,       // Bỏ 'toast: true' hoặc đặt thành 'false'
+            timer: 3500,
+            showConfirmButton: false,
+            padding: '10px',
+            customClass: {
+                popup: 'swal-popup-custom'
+            }
+        });
+        return;
     }
-  
+
     if (amountTON > maxAmount) {
-      Swal.fire({
-        icon: 'error',
-        html: `You can only send up to <strong>${truncateDecimal(maxAmount)}</strong> TON.`,
-        position: 'top-right', // Popup hiển thị ở góc phải trên
-        toast: true, // Hiển thị dưới dạng toast
-        timer: 3000, // Tự động đóng sau 3 giây
-        showConfirmButton: false, // Không hiển thị nút xác nhận
-        padding: '10px', // Padding cho thông báo
-        customClass: {
-          popup: 'swal-popup-custom' // Thêm lớp tùy chỉnh cho popup
-        }
-      });
-      return;
+        Swal.fire({
+            icon: 'error',
+            html: `Bạn chỉ có thể gửi tối đa <strong>${truncateDecimal(maxAmount)}</strong> TON.`, 
+            position: 'center', // Đã đổi từ 'top-right' sang 'center'
+            toast: false,       // Bỏ 'toast: true' hoặc đặt thành 'false'
+            timer: 3500,
+            showConfirmButton: false,
+            padding: '10px',
+            customClass: {
+                popup: 'swal-popup-custom'
+            }
+        });
+        return;
     }
-  
+
+    // Phần này cần các hàm hỗ trợ từ đoạn code thứ hai, ví dụ: convertRawAddressToB64url
+    // và popup xác nhận trước khi gửi.
+    // Vì không có các hàm này trong đoạn code đầu tiên, tôi sẽ giả định `toAddressB64url` 
+    // chính là `toAddress` và bỏ qua phần xác nhận chi tiết để tập trung vào việc chỉnh sửa style.
+
     try {
-      const amountNanoTON = BigInt(amountTON * 1e9);
-  
-      const tx = {
-        validUntil: Math.floor(Date.now() / 1000) + 60,
-        messages: [{
-          address: toAddress,
-          amount: amountNanoTON.toString(),
-          payload: memo ? TON_CONNECT_UI.textToPayload(memo) : undefined
-        }]
-      };
-  
-      const result = await connector.sendTransaction(tx);
+        const amountNanoTON = BigInt(amountTON * 1e9);
 
-      Swal.fire({
-        icon: 'success',
-        html: `You have successfully sent <strong>${truncateDecimal(amountTON)}</strong> TON<br>to address <strong>${toAddress}</strong>.`,
-        position: 'top-right', // Popup hiển thị ở góc phải trên
-        toast: true, // Hiển thị dưới dạng toast
-        timer: 3000, // Tự động đóng sau 3 giây
-        showConfirmButton: false, // Không hiển thị nút xác nhận
-        padding: '10px', // Padding cho thông báo
-        customClass: {
-          popup: 'swal-popup-custom' // Thêm lớp tùy chỉnh cho popup
-        }
-      });
+        // Hiển thị popup loading trước khi gửi giao dịch
+        Swal.fire({
+            title: 'Đang gửi giao dịch...',
+            html: `
+                <div class="swal2-loading-spinner"></div>
+                <p>Vui lòng mở ví TON của bạn để xác nhận giao dịch.</p>
+                <br>
+                <small style="color: #888;">Số lượng: <strong>${truncateDecimal(amountTON)} TON</strong></small><br>
+                <small style="color: #888;">Đến: <strong>${toAddress}</strong></small>
+            `,
+            allowOutsideClick: false, 
+            allowEscapeKey: false,   
+            showConfirmButton: false, 
+            customClass: {
+                popup: 'swal-popup-custom'
+            },
+            didOpen: () => {}
+        });
 
-      console.log("Result:", result);
+        const tx = {
+            validUntil: Math.floor(Date.now() / 1000) + 60,
+            messages: [{
+                address: toAddress,
+                amount: amountNanoTON.toString(),
+                payload: memo ? TON_CONNECT_UI.textToPayload(memo) : undefined
+            }]
+        };
+
+        const result = await connector.sendTransaction(tx);
+
+        Swal.close(); // Đóng popup loading
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Giao dịch thành công!',
+            html: `Bạn đã gửi thành công <strong>${truncateDecimal(amountTON)}</strong> TON<br>đến địa chỉ <strong>${toAddress}</strong>.`,
+            position: 'center', // Đã đổi từ 'top-right' sang 'center'
+            toast: false,       // Bỏ 'toast: true' hoặc đặt thành 'false'
+            timer: 5000, 
+            showConfirmButton: false,
+            padding: '10px',
+            customClass: {
+                popup: 'swal-popup-custom'
+            }
+        });
+
+        console.log("Result:", result);
+
+        // Các dòng này có thể thêm vào nếu bạn muốn cập nhật giao diện sau giao dịch thành công
+        // document.getElementById("to-address").value = '';
+        // document.getElementById("ton-amount").value = '';
+        // document.getElementById("memo-text").value = '';
+
     } catch (err) {
-      console.error("Error while sending TON:", err);
-      Swal.fire({
-        icon: 'error',
-        html: `<strong>Unknown error</strong>`,
-        position: 'top-right', // Popup hiển thị ở góc phải trên
-        toast: true, // Hiển thị dưới dạng toast
-        timer: 3000, // Tự động đóng sau 3 giây
-        showConfirmButton: false, // Không hiển thị nút xác nhận
-        padding: '10px', // Padding cho thông báo
-        customClass: {
-          popup: 'swal-popup-custom' // Thêm lớp tùy chỉnh cho popup
+        Swal.close(); // Đóng popup loading nếu có lỗi
+        console.error("Error while sending TON:", err);
+        let errorMessage = '<strong>Đã xảy ra lỗi không xác định. Vui lòng thử lại.</strong>';
+        
+        if (err.message) {
+            if (err.message.includes('User rejected the transaction')) {
+                errorMessage = '<strong>Giao dịch đã bị từ chối bởi người dùng trong ví.</strong>';
+            } else if (err.message.includes('Failed to send transaction') || err.message.includes('network')) {
+                errorMessage = '<strong>Không thể gửi giao dịch. Vui lòng kiểm tra kết nối mạng và số dư ví của bạn.</strong>';
+            } else {
+                errorMessage = `<strong>Lỗi:</strong> ${err.message}`;
+            }
         }
-      });
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Giao dịch thất bại!',
+            html: errorMessage,
+            position: 'center', // Đã đổi từ 'top-right' sang 'center'
+            toast: false,       // Bỏ 'toast: true' hoặc đặt thành 'false'
+            timer: 5000,
+            showConfirmButton: false,
+            padding: '10px',
+            customClass: {
+                popup: 'swal-popup-custom'
+            }
+        });
     }
-  });
+});
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
