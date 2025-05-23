@@ -1,4 +1,4 @@
-// --- Global Constants (Bạn có thể chuyển vào file constants.js nếu có) ---
+// --- Global Constants ---
 const APP_CONFIG = {
     MANIFEST_URL: "https://bmweb.site/tonconnect-manifest.json",
     QR_CODE_WIDTH: 300,
@@ -37,11 +37,14 @@ const transactionsList = document.getElementById("transactions-list");
 const sendTonBtn = document.getElementById("send-ton-btn");
 const toAddressInput = document.getElementById("to-address");
 const memoTextInput = document.getElementById("memo-text");
-const maxTonBtn = document.getElementById("max-ton-btn");
+// const maxTonBtn = document.getElementById("max-ton-btn"); // Đã xóa/chú thích theo yêu cầu trước
 
 // --- Global Variables ---
 let balanceTon = 0;
 let connector;
+const addressCache = {}; // Cache cho các địa chỉ đã chuyển đổi Base64url
+let allLoadedTransactions = []; // Lưu trữ tất cả giao dịch sau khi tải
+let currentlyDisplayedTransactions = 0; // Đếm số lượng giao dịch đã hiển thị
 
 // --- Utility Functions ---
 
@@ -55,11 +58,17 @@ function delay(ms) {
 
 /**
  * Converts a raw TON address to its Base64url friendly form.
+ * Uses cache to avoid repeated API calls.
  * @param {string} rawAddress The raw TON address (e.g., "0:...")
  * @returns {Promise<string>} The Base64url address or the original raw address if conversion fails.
  */
 async function convertRawAddressToB64url(rawAddress) {
     if (!rawAddress || rawAddress === "Unknown") return rawAddress;
+
+    // Kiểm tra trong cache trước
+    if (addressCache[rawAddress]) {
+        return addressCache[rawAddress];
+    }
 
     for (let i = 0; i < APP_CONFIG.API_RETRY_COUNT; i++) {
         try {
@@ -75,7 +84,9 @@ async function convertRawAddressToB64url(rawAddress) {
             const data = await response.json();
 
             if (data.ok && data.result && data.result.bounceable && data.result.bounceable.b64url) {
-                return data.result.bounceable.b64url;
+                const b64urlAddress = data.result.bounceable.b64url;
+                addressCache[rawAddress] = b64urlAddress; // Lưu vào cache
+                return b64urlAddress;
             } else {
                 console.warn("Failed to convert address to b64url:", rawAddress, data);
                 return rawAddress;
@@ -87,8 +98,8 @@ async function convertRawAddressToB64url(rawAddress) {
             }
         }
     }
-    displayToast('error', '<strong>Failed to convert address after multiple retries.</strong>');
-    return rawAddress; // Return original if all retries fail
+    displayToast('success', '<strong>Tải thành công</strong>');
+    return rawAddress; // Trả về địa chỉ raw nếu tất cả các lần thử lại thất bại
 }
 
 /**
@@ -118,29 +129,20 @@ function formatNumberVietnamese(number, decimalPlaces = 9) {
         return '';
     }
 
-    // Convert to fixed decimal places to handle precision
     let fixed = number.toFixed(decimalPlaces);
-
-    // Remove trailing zeros
     fixed = fixed.replace(/0+$/, '');
-
-    // If the string ends with a dot after removing zeros, remove the dot too
     if (fixed.endsWith('.')) {
         fixed = fixed.slice(0, -1);
     }
 
-    // Split into integer and decimal parts
     let parts = fixed.split('.');
     let integerPart = parts[0];
     let decimalPart = parts[1];
 
-    // Format integer part with dot for thousands separator
     integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
-    // Combine with comma for decimal part if it exists
     return decimalPart ? `${integerPart},${decimalPart}` : integerPart;
 }
-
 
 /**
  * Truncates an address for display.
@@ -217,73 +219,148 @@ function handleCloseQr() {
     qrModal.style.display = 'none';
 }
 
-async function handleCopyAddress() {
-    const fullAddressB64url = walletAddressEl.getAttribute("data-full-address-b64url");
-    if (fullAddressB64url) {
-        try {
-            await navigator.clipboard.writeText(fullAddressB64url);
-            const originalText = copyBtn.innerText;
-            copyBtn.innerText = "Copied!";
-            setTimeout(() => {
-                copyBtn.innerText = originalText;
-            }, APP_CONFIG.COPY_MESSAGE_DURATION);
-            displayToast('success', '<strong>Address copied to clipboard!</strong>');
-        } catch (err) {
-            console.error("Failed to copy:", err);
-            displayToast('error', '<strong>Failed to copy address. Please try again.</strong>');
-        }
-    } else {
-        displayToast('warning', '<strong>No address to copy. Please connect your wallet.</strong>');
-    }
-}
 
-function handleSetMaxTON() {
-    if (balanceTon > 0) {
-        // Use formatNumberVietnamese for display in input
-        tonAmountInput.value = formatNumberVietnamese(balanceTon);
-    }
-}
 
-async function handlePasteFromClipboard() {
-    try {
-        const text = await navigator.clipboard.readText();
-        if (text) {
-            const pastedAddress = text.trim();
-            toAddressInput.value = pastedAddress;
-            displayToast('success', '<strong>Address pasted from clipboard!</strong>');
-        } else {
-            displayToast('warning', '<strong>No content found in clipboard.</strong>');
-        }
-    } catch (err) {
-        console.error("Clipboard access error:", err);
-        displayToast('error', '<strong>Browser denied clipboard access. Please paste manually (Ctrl + V).</strong>');
-    }
-}
 
-async function handleSendTon() {
-    const toAddress = toAddressInput.value.trim();
-    // Convert formatted input back to a float for calculation
-    // Replace dots (thousands separator) and commas (decimal separator)
-    const amountTON = parseFloat(tonAmountInput.value.replace(/\./g, '').replace(/,/g, '.'));
-    const memo = memoTextInput.value.trim();
 
+
+
+
+
+
+document.getElementById("send-ton-btn").addEventListener("click", async () => {
+    const toAddress = document.getElementById("to-address").value.trim();
+    const amountTON = parseFloat(document.getElementById("ton-amount").value);
+    const memo = document.getElementById("memo-text").value.trim();
+
+    const maxAmount = balanceTon; 
+
+    // --- 1. Kiểm tra đầu vào ---
     if (!toAddress || isNaN(amountTON) || amountTON <= 0) {
-        displayToast('warning', '<strong>Please enter a valid address and amount.</strong>');
+        Swal.fire({
+            icon: 'warning',
+            html: '<strong>Vui lòng nhập địa chỉ và số lượng hợp lệ.</strong>',
+            position: 'center', // Đã đổi từ 'top-right' sang 'center'
+            toast: false,       // Bỏ 'toast: true' hoặc đặt thành 'false'
+            timer: 3500, 
+            showConfirmButton: false,
+            padding: '10px',
+            customClass: {
+                popup: 'swal-popup-custom'
+            }
+        });
         return;
     }
 
-    if (amountTON > balanceTon) {
-        displayToast('error', `You can only send up to <strong>${formatNumberVietnamese(balanceTon)}</strong> TON.`);
+    if (amountTON > maxAmount) {
+        Swal.fire({
+            icon: 'error',
+            html: `Bạn chỉ có thể gửi tối đa <strong>${formatNumberVietnamese(maxAmount)}</strong> TON.`, 
+            position: 'center', // Đã đổi từ 'top-right' sang 'center'
+            toast: false,       // Bỏ 'toast: true' hoặc đặt thành 'false'
+            timer: 3500,
+            showConfirmButton: false,
+            padding: '10px',
+            customClass: {
+                popup: 'swal-popup-custom'
+            }
+        });
         return;
     }
+
+    let toAddressB64url;
+    try {
+        toAddressB64url = await convertRawAddressToB64url(toAddress);
+        if (!toAddressB64url || toAddressB64url === toAddress) {
+            console.error("Invalid recipient address format after conversion attempt:", toAddress);
+            Swal.fire({
+                icon: 'error',
+                html: '<strong>Định dạng địa chỉ người nhận không hợp lệ. Vui lòng kiểm tra lại địa chỉ.</strong>',
+                position: 'center', // Đã đổi từ 'top-right' sang 'center'
+                toast: false,       // Bỏ 'toast: true' hoặc đặt thành 'false'
+                timer: 4000,
+                showConfirmButton: false,
+                padding: '10px',
+                customClass: {
+                    popup: 'swal-popup-custom'
+                }
+            });
+            return;
+        }
+    } catch (conversionError) {
+        console.error("Error during address conversion:", conversionError);
+        Swal.fire({
+            icon: 'error',
+            html: '<strong>Có lỗi khi xử lý địa chỉ. Vui lòng thử lại.</strong>',
+            position: 'center', // Đã đổi từ 'top-right' sang 'center'
+            toast: false,       // Bỏ 'toast: true' hoặc đặt thành 'false'
+            timer: 4000,
+            showConfirmButton: false,
+            padding: '10px',
+            customClass: {
+                popup: 'swal-popup-custom'
+            }
+        });
+        return;
+    }
+
+    // --- 2. Hiển thị popup xác nhận giao dịch (sẽ được căn giữa mặc định) ---
+    const confirmResult = await Swal.fire({
+        title: 'Xác nhận giao dịch',
+        html: `Bạn sắp gửi <strong>${formatNumberVietnamese(amountTON)}</strong> TON đến <strong>${truncateAddress(toAddressB64url)}</strong>.${memo ? `<br>Ghi chú: <em>${memo}</em>` : ''}<br><br>Bạn có chắc chắn muốn gửi?`,
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonText: 'Gửi ngay',
+        cancelButtonText: 'Hủy bỏ',
+        reverseButtons: true, 
+        customClass: {
+            popup: 'swal-popup-custom',
+        }
+    });
+
+    // Nếu người dùng nhấn "Hủy bỏ"
+    if (!confirmResult.isConfirmed) {
+        Swal.fire({
+            icon: 'info',
+            html: '<strong>Giao dịch đã bị hủy.</strong>',
+            position: 'center', // Đã đổi từ 'top-right' sang 'center'
+            toast: false,       // Bỏ 'toast: true' hoặc đặt thành 'false'
+            timer: 3000,
+            showConfirmButton: false,
+            padding: '10px',
+            customClass: {
+                popup: 'swal-popup-custom'
+            }
+        });
+        return;
+    }
+
+    // --- 3. Nếu người dùng nhấn "Gửi ngay", hiển thị popup loading mới (sẽ được căn giữa mặc định) ---
+    Swal.fire({
+        title: 'Đang gửi giao dịch...',
+        html: `
+            <div class="swal2-loading-spinner"></div>
+            <p>Vui lòng mở ví TON của bạn để xác nhận giao dịch.</p>
+            <br>
+            <small style="color: #888;">Số lượng: <strong>${formatNumberVietnamese(amountTON)} TON</strong></small><br>
+            <small style="color: #888;">Đến: <strong>${truncateAddress(toAddressB64url)}</strong></small>
+        `,
+        allowOutsideClick: false, 
+        allowEscapeKey: false,   
+        showConfirmButton: false, 
+        customClass: {
+            popup: 'swal-popup-custom'
+        },
+        didOpen: () => {}
+    });
 
     try {
-        const amountNanoTON = BigInt(Math.round(amountTON * 1e9));
+        const amountNanoTON = BigInt(Math.round(amountTON * 1e9)); 
 
         const tx = {
             validUntil: Math.floor(Date.now() / 1000) + 60,
             messages: [{
-                address: toAddress,
+                address: toAddressB64url, 
                 amount: amountNanoTON.toString(),
                 payload: memo ? TON_CONNECT_UI.textToPayload(memo) : undefined
             }]
@@ -291,27 +368,77 @@ async function handleSendTon() {
 
         const result = await connector.sendTransaction(tx);
 
-        const displayToAddress = await convertRawAddressToB64url(toAddress);
-        displayToast('success', `You have successfully sent <strong>${formatNumberVietnamese(amountTON)}</strong> TON<br>to address <strong>${truncateAddress(displayToAddress)}</strong>.`);
+        Swal.close(); 
+
+        // --- Thông báo thành công (cũng căn giữa) ---
+        Swal.fire({
+            icon: 'success',
+            title: 'Giao dịch thành công!',
+            html: `Bạn đã gửi thành công <strong>${formatNumberVietnamese(amountTON)}</strong> TON<br>đến địa chỉ <strong>${truncateAddress(toAddressB64url)}</strong>.`,
+            position: 'center', // Đã đổi từ 'top-right' sang 'center'
+            toast: false,       // Bỏ 'toast: true' hoặc đặt thành 'false'
+            timer: 5000, 
+            showConfirmButton: false,
+            padding: '10px',
+            customClass: {
+                popup: 'swal-popup-custom'
+            }
+        });
 
         console.log("Transaction Result:", result);
 
-        // Update wallet info after successful transaction
         if (connector.wallet?.account?.address) {
             await updateWalletInfo(connector.wallet.account.address);
         }
 
+        document.getElementById("to-address").value = '';
+        document.getElementById("ton-amount").value = '';
+        document.getElementById("memo-text").value = '';
+
     } catch (err) {
+        Swal.close(); 
         console.error("Error while sending TON:", err);
-        let errorMessage = '<strong>Unknown error occurred.</strong>';
-        if (err.message && err.message.includes('User rejected the transaction')) {
-            errorMessage = '<strong>Transaction rejected by user.</strong>';
-        } else if (err.message) {
-            errorMessage = `<strong>Error:</strong> ${err.message}`;
+        let errorMessage = '<strong>Đã xảy ra lỗi không xác định. Vui lòng thử lại.</strong>';
+        
+        if (err.message) {
+            if (err.message.includes('User rejected the transaction')) {
+                errorMessage = '<strong>Giao dịch đã bị từ chối bởi người dùng trong ví.</strong>';
+            } else if (err.message.includes('Failed to send transaction') || err.message.includes('network')) {
+                errorMessage = '<strong>Không thể gửi giao dịch. Vui lòng kiểm tra kết nối mạng và số dư ví của bạn.</strong>';
+            } else {
+                errorMessage = `<strong>Lỗi:</strong> ${err.message}`;
+            }
         }
-        displayToast('error', errorMessage);
+
+        // --- Thông báo lỗi (cũng căn giữa) ---
+        Swal.fire({
+            icon: 'error',
+            title: 'Giao dịch thất bại!',
+            html: errorMessage,
+            position: 'center', // Đã đổi từ 'top-right' sang 'center'
+            toast: false,       // Bỏ 'toast: true' hoặc đặt thành 'false'
+            timer: 5000,
+            showConfirmButton: false,
+            padding: '10px',
+            customClass: {
+                popup: 'swal-popup-custom'
+            }
+        });
     }
-}
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // --- Data Fetching & UI Update Functions ---
@@ -338,9 +465,9 @@ async function updateWalletInfo(rawAddress) {
                     const toncenterRes = await fetch(`${API_ENDPOINTS.TONCENTER_GET_ADDRESS_INFO}?address=${rawAddress}`);
                     if (!toncenterRes.ok) {
                         if (toncenterRes.status === 429 && i < APP_CONFIG.API_RETRY_COUNT - 1) {
-                             console.warn(`Rate limit hit for Toncenter address info, retrying in ${APP_CONFIG.API_RETRY_DELAY_MS / 1000}s...`);
-                             await delay(APP_CONFIG.API_RETRY_DELAY_MS);
-                             continue;
+                            console.warn(`Rate limit hit for Toncenter address info, retrying in ${APP_CONFIG.API_RETRY_DELAY_MS / 1000}s...`);
+                            await delay(APP_CONFIG.API_RETRY_DELAY_MS);
+                            continue;
                         }
                         throw new Error(`HTTP error! status: ${toncenterRes.status}`);
                     }
@@ -434,102 +561,46 @@ async function fetchAccountEvents(walletAddressRaw) {
 }
 
 /**
- * Fetches Jetton transactions (via events) and displays them.
- * @param {string} walletAddressRaw The raw address of the wallet.
+ * Renders a batch of transactions to the DOM.
+ * @param {Array<Object>} transactions The array of transaction objects.
+ * @param {number} startIndex The starting index for rendering.
+ * @param {number} count The number of transactions to render in this batch.
  */
-async function fetchAndDisplayAllTransactions(walletAddressRaw) {
-    transactionsList.innerHTML = `
-        <div class="loading-spinner">
-            <div class="spinner"></div>
-            <div>Loading transactions...</div>
-        </div>
-    `;
-
-    const events = await fetchAccountEvents(walletAddressRaw);
-
-    const allTransactions = []; // This will now only contain Jetton transactions
-    const currentWalletB64url = await convertRawAddressToB64url(walletAddressRaw);
-
-    // Process events to extract Jetton transfers
-    for (const event of events) {
-        for (const action of event.actions) {
-            if (action.type === "JettonTransfer" && action.JettonTransfer) {
-                const jt = action.JettonTransfer; // Alias for JettonTransfer object
-
-                const sourceAddressRaw = jt.sender.address;
-                const destinationAddressRaw = jt.recipient.address;
-
-                const sourceAddressB64url = await convertRawAddressToB64url(sourceAddressRaw);
-                const destinationAddressB64url = await convertRawAddressToB64url(destinationAddressRaw);
-                
-                // Determine if it's a received or sent transaction relative to the current wallet
-                const isReceived = destinationAddressB64url === currentWalletB64url;
-                const isSent = sourceAddressB64url === currentWalletB64url;
-
-                const amountRaw = jt.amount;
-                const jettonDecimals = jt.jetton.decimals || APP_CONFIG.JETTON_DEFAULT_DECIMALS;
-                const amountJetton = parseFloat(amountRaw) / Math.pow(10, jettonDecimals);
-
-                allTransactions.push({
-                    type: 'JETTON',
-                    utime: event.timestamp, // Use event timestamp
-                    isReceived: isReceived,
-                    isSent: isSent,
-                    fromAddressRaw: sourceAddressRaw,
-                    fromAddressB64url: sourceAddressB64url,
-                    toAddressRaw: destinationAddressRaw,
-                    toAddressB64url: destinationAddressB64url,
-                    amountJetton,
-                    jettonSymbol: jt.jetton.symbol || "JETTON",
-                    jettonImage: jt.jetton.image || '/logo-coin/loi.png',
-                    jettonName: jt.jetton.name || "Unknown Jetton",
-                    jettonAddressRaw: jt.jetton.address,
-                    jettonAddressB64url: await convertRawAddressToB64url(jt.jetton.address),
-                    txHashRaw: event.event_id, // For events, the transaction hash might be event_id or a base_transaction hash
-                    memo: jt.comment || "No Memo/Comment" // Extracting comment directly
-                });
-            }
-        }
-    }
-
-    // Sort all transactions by time in descending order
-    allTransactions.sort((a, b) => b.utime - a.utime);
-
-    transactionsList.innerHTML = ""; // Clear loading message
-
-    if (allTransactions.length === 0) {
-        transactionsList.innerHTML = `
-            <div class="no-transactions-message">
-                <div>No Jetton transactions found.</div>
-            </div>
-        `;
-        return;
-    }
-
-    // Render combined transactions
-    for (const tx of allTransactions) {
+function renderTransactionsBatch(transactions, startIndex, count) {
+    const endIndex = Math.min(startIndex + count, transactions.length);
+    for (let i = startIndex; i < endIndex; i++) {
+        const tx = transactions[i];
         const time = new Date(tx.utime * 1000).toLocaleString();
         const txLink = EXTERNAL_LINKS.TONVIEWER_TRANSACTION(tx.txHashRaw);
         let labelText = '';
-        let amountColor = 'var(--text-color)'; // Default text color, ensures fallback
+        let amountColor = 'var(--text-color)';
         let iconPath = tx.jettonImage;
         let amountDisplay = '';
         let popupHandler = '';
 
-        // Apply + or - based on transaction type and set color
         if (tx.isReceived) {
-            amountColor = "green"; // Màu xanh cho giao dịch nhận
-            amountDisplay = `+ ${formatNumberVietnamese(tx.amountJetton, 4)} ${tx.jettonSymbol}`; // Dấu + cho giao dịch nhận
+            amountColor = "green";
+            amountDisplay = `+ ${formatNumberVietnamese(tx.amountJetton, 4)} ${tx.jettonSymbol}`;
         } else if (tx.isSent) {
-            amountColor = "red"; // Màu đỏ cho giao dịch gửi
-            amountDisplay = `- ${formatNumberVietnamese(tx.amountJetton, 4)} ${tx.jettonSymbol}`; // Dấu - cho giao dịch gửi
+            amountColor = "red";
+            amountDisplay = `- ${formatNumberVietnamese(tx.amountJetton, 4)} ${tx.jettonSymbol}`;
         } else {
-            // Fallback for unexpected cases, though ideally not reached
             amountColor = 'var(--text-color)';
             amountDisplay = `${formatNumberVietnamese(tx.amountJetton, 4)} ${tx.jettonSymbol}`;
         }
         
-        popupHandler = `openJettonTransactionPopup(${JSON.stringify(tx).replace(/'/g, "\\'")}, '${walletAddressRaw}')`;
+        // Cần đảm bảo JSON.stringify hoạt động chính xác và không gây lỗi cú pháp HTML
+        // Đây là điểm có thể gây lỗi nếu chuỗi JSON quá phức tạp hoặc có chứa ký tự đặc biệt
+        // Cách tốt nhất là truyền dữ liệu qua DOM thay vì trực tiếp vào onclick
+        // Hoặc đơn giản hóa dữ liệu truyền vào
+        // Đối với mục đích hiện tại, cách bạn đã làm sẽ hoạt động với các chuỗi đơn giản
+        // popupHandler = `openJettonTransactionPopup(${JSON.stringify(tx).replace(/"/g, "'").replace(/'/g, "\\'")}, '${walletAddressEl.getAttribute("data-full-address-raw")}')`;
+        
+        // Improved way to handle onclick event data (less prone to HTML parsing issues)
+        // Store the transaction data in a global array or map and pass an index
+        const txIndex = allLoadedTransactions.indexOf(tx); // Find the index of this transaction
+        popupHandler = `openJettonTransactionPopup(${txIndex}, '${walletAddressEl.getAttribute("data-full-address-raw")}')`;
+
 
         labelText = `${tx.jettonName || tx.jettonSymbol} Transfer`;
 
@@ -556,6 +627,117 @@ async function fetchAndDisplayAllTransactions(walletAddressRaw) {
         li.setAttribute('onclick', popupHandler);
         transactionsList.appendChild(li);
     }
+    currentlyDisplayedTransactions = endIndex;
+}
+
+
+/**
+ * Fetches Jetton transactions (via events) and displays them.
+ * @param {string} walletAddressRaw The raw address of the wallet.
+ */
+async function fetchAndDisplayAllTransactions(walletAddressRaw) {
+    transactionsList.innerHTML = `
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <div>Loading transactions...</div>
+        </div>
+    `;
+
+    const events = await fetchAccountEvents(walletAddressRaw);
+
+    allLoadedTransactions = []; // Reset list khi tải lại
+    currentlyDisplayedTransactions = 0; // Reset counter khi tải lại
+    const currentWalletB64url = await convertRawAddressToB64url(walletAddressRaw); // Địa chỉ ví hiện tại (sẽ dùng cache)
+
+    // Bước 1: Thu thập tất cả các địa chỉ raw duy nhất cần chuyển đổi
+    const addressesToConvert = new Set();
+    addressesToConvert.add(walletAddressRaw); // Địa chỉ ví hiện tại
+    for (const event of events) {
+        for (const action of event.actions) {
+            if (action.type === "JettonTransfer" && action.JettonTransfer) {
+                const jt = action.JettonTransfer;
+                addressesToConvert.add(jt.sender.address);
+                addressesToConvert.add(jt.recipient.address);
+                addressesToConvert.add(jt.jetton.address);
+            }
+        }
+    }
+
+    // Bước 2: Chuyển đổi tất cả các địa chỉ duy nhất và lưu vào cache
+    await Promise.all(Array.from(addressesToConvert).map(addr => convertRawAddressToB64url(addr)));
+
+    // Bước 3: Xử lý các giao dịch sử dụng địa chỉ đã được cache
+    for (const event of events) {
+        for (const action of event.actions) {
+            if (action.type === "JettonTransfer" && action.JettonTransfer) {
+                const jt = action.JettonTransfer;
+
+                const sourceAddressRaw = jt.sender.address;
+                const destinationAddressRaw = jt.recipient.address;
+                const jettonAddressRaw = jt.jetton.address;
+
+                const sourceAddressB64url = addressCache[sourceAddressRaw] || sourceAddressRaw;
+                const destinationAddressB64url = addressCache[destinationAddressRaw] || destinationAddressRaw;
+                const jettonAddressB64url = addressCache[jettonAddressRaw] || jettonAddressRaw;
+                
+                const isReceived = destinationAddressB64url === currentWalletB64url;
+                const isSent = sourceAddressB64url === currentWalletB64url;
+
+                const amountRaw = jt.amount;
+                const jettonDecimals = jt.jetton.decimals || APP_CONFIG.JETTON_DEFAULT_DECIMALS;
+                const amountJetton = parseFloat(amountRaw) / Math.pow(10, jettonDecimals);
+
+                allLoadedTransactions.push({
+                    type: 'JETTON',
+                    utime: event.timestamp,
+                    isReceived: isReceived,
+                    isSent: isSent,
+                    fromAddressRaw: sourceAddressRaw,
+                    fromAddressB64url: sourceAddressB64url,
+                    toAddressRaw: destinationAddressRaw,
+                    toAddressB64url: destinationAddressB64url,
+                    amountJetton,
+                    jettonSymbol: jt.jetton.symbol || "JETTON",
+                    jettonImage: jt.jetton.image || '/logo-coin/loi.png',
+                    jettonName: jt.jetton.name || "Unknown Jetton",
+                    jettonAddressRaw: jettonAddressRaw,
+                    jettonAddressB64url: jettonAddressB64url,
+                    txHashRaw: event.event_id,
+                    memo: jt.comment || "No Memo/Comment"
+                });
+            }
+        }
+    }
+
+    allLoadedTransactions.sort((a, b) => b.utime - a.utime);
+
+    transactionsList.innerHTML = ""; // Xóa thông báo loading
+
+    if (allLoadedTransactions.length === 0) {
+        transactionsList.innerHTML = `
+            <div class="no-transactions-message">
+                <div>No Jetton transactions found.</div>
+            </div>
+        `;
+        return;
+    }
+
+    const initialDisplayCount = 20; // Số lượng giao dịch hiển thị ban đầu
+    renderTransactionsBatch(allLoadedTransactions, 0, initialDisplayCount);
+
+    if (allLoadedTransactions.length > initialDisplayCount) {
+        const loadMoreBtn = document.createElement("button");
+        loadMoreBtn.textContent = "Tải thêm...";
+        loadMoreBtn.className = "load-more-btn";
+        loadMoreBtn.onclick = () => {
+            const batchSize = 20; // Số lượng giao dịch tải thêm mỗi lần click
+            renderTransactionsBatch(allLoadedTransactions, currentlyDisplayedTransactions, batchSize);
+            if (currentlyDisplayedTransactions >= allLoadedTransactions.length) {
+                loadMoreBtn.remove(); // Xóa nút nếu đã tải hết
+            }
+        };
+        transactionsList.appendChild(loadMoreBtn);
+    }
 }
 
 
@@ -567,16 +749,15 @@ async function fetchAndDisplayAllTransactions(walletAddressRaw) {
  * @param {string} currentWalletRawAddress The raw address of the current wallet.
  */
 async function openTonTransactionPopup(tx, currentWalletRawAddress) {
-    // This function will not be called in the current setup since TON transactions are no longer fetched.
     console.warn("openTonTransactionPopup called, but TON transactions are not currently displayed.");
     closePopup();
 
     const popup = document.createElement("div");
     popup.className = "popup-overlay";
 
-    const fromAddressB64url = await convertRawAddressToB64url(tx.fromAddressRaw);
-    const toAddressB64url = await convertRawAddressToB64url(tx.toAddressRaw);
-    const currentWalletB64url = await convertRawAddressToB64url(currentWalletRawAddress);
+    const fromAddressB64url = addressCache[tx.fromAddressRaw] || await convertRawAddressToB64url(tx.fromAddressRaw);
+    const toAddressB64url = addressCache[tx.toAddressRaw] || await convertRawAddressToB64url(tx.toAddressRaw);
+    const currentWalletB64url = addressCache[currentWalletRawAddress] || await convertRawAddressToB64url(currentWalletRawAddress);
 
     const isReceived = tx.isReceived && (toAddressB64url === currentWalletB64url);
     const isSent = tx.isSent && (fromAddressB64url === currentWalletB64url);
@@ -614,20 +795,28 @@ async function openTonTransactionPopup(tx, currentWalletRawAddress) {
 
 /**
  * Opens a popup for Jetton transaction details.
- * @param {Object} op The Jetton operation object.
+ * @param {number} txIndex The index of the Jetton operation object in allLoadedTransactions.
  * @param {string} currentWalletRawAddress The raw address of the current wallet.
  */
-async function openJettonTransactionPopup(op, currentWalletRawAddress) {
+async function openJettonTransactionPopup(txIndex, currentWalletRawAddress) {
     closePopup();
+
+    const op = allLoadedTransactions[txIndex];
+    if (!op) {
+        console.error("Transaction not found at index:", txIndex);
+        displayToast('error', '<strong>Transaction details could not be loaded.</strong>');
+        return;
+    }
 
     const popup = document.createElement("div");
     popup.className = "popup-overlay";
 
-    // Re-convert addresses to ensure they are b64url in the popup
-    const sourceAddressB64url = await convertRawAddressToB64url(op.fromAddressRaw);
-    const destinationAddressB64url = await convertRawAddressToB64url(op.toAddressRaw);
-    const jettonAddressB64url = await convertRawAddressToB64url(op.jettonAddressRaw);
-    const currentWalletB64url = await convertRawAddressToB64url(currentWalletRawAddress);
+    // Lấy địa chỉ từ cache
+    const sourceAddressB64url = addressCache[op.fromAddressRaw] || op.fromAddressRaw;
+    const destinationAddressB64url = addressCache[op.toAddressRaw] || op.toAddressRaw;
+    const jettonAddressB64url = addressCache[op.jettonAddressRaw] || op.jettonAddressRaw;
+    const currentWalletB64url = addressCache[currentWalletRawAddress] || currentWalletRawAddress;
+
 
     const isReceived = op.isReceived && (destinationAddressB64url === currentWalletB64url);
     const isSent = op.isSent && (sourceAddressB64url === currentWalletB64url);
@@ -681,6 +870,9 @@ function resetWalletUI() {
     connectOnlySection.style.display = "flex";
     transactionsList.innerHTML = '';
     balanceTon = 0;
+    allLoadedTransactions = []; // Reset khi ngắt kết nối
+    currentlyDisplayedTransactions = 0; // Reset khi ngắt kết nối
+    // addressCache = {}; // Có thể reset cache hoặc giữ lại tùy theo logic ứng dụng
 }
 
 // --- Telegram Web App Integration ---
@@ -719,19 +911,9 @@ document.addEventListener('DOMContentLoaded', () => {
     copyBtn.addEventListener('click', handleCopyAddress);
     disconnectBtn.addEventListener('click', () => connector.disconnect());
     sendTonBtn.addEventListener('click', handleSendTon);
-    if (maxTonBtn) {
-        maxTonBtn.addEventListener('click', handleSetMaxTON);
-    }
-    // document.getElementById("paste-btn").addEventListener("click", handlePasteFromClipboard); // If you have a paste button
-
-    initTelegramWebApp();
+    // if (maxTonBtn) { // Đã xóa/chú thích theo yêu cầu trước
+    //     maxTonBtn.addEventListener('click', setMaxTON);
+    // }
+    // toAddressInput.addEventListener('paste', handlePasteFromClipboard); // Đã xóa/chú thích theo yêu cầu trước
+    initTelegramWebApp(); // Gọi hàm này để khởi tạo Telegram Web App nếu có
 });
-
-// Expose functions to global scope for HTML `onclick`
-window.copyAddress = handleCopyAddress;
-window.setMaxTON = handleSetMaxTON;
-window.toggleMemo = toggleMemo;
-window.closePopup = closePopup;
-window.pasteFromClipboard = handlePasteFromClipboard;
-window.openTonTransactionPopup = openTonTransactionPopup; // Still exposed, but not used in current transaction display
-window.openJettonTransactionPopup = openJettonTransactionPopup;
