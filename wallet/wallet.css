@@ -146,8 +146,8 @@ ul#transactions-list {
 }
 
 .icon img {
-  width: 20px;
-  height: 20px;
+  width: 25px;
+  height: 25px;
   border-radius: 50%; /* Make Jetton icons round */
   object-fit: cover;
   margin-top: 5px;
