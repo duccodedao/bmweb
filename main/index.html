@@ -647,22 +647,25 @@ color: #000000; /* màu xanh dương */
 
 
 
-  <footer>
-    <a href="/wallet/index.html" class="footer-item" data-page="wallet_new.html">
-      <i class="fas fa-wallet"></i>
-      <span>Wallet</span>
-    </a>
-    <a href="/jetton/index.html" class="footer-item" data-page="jetton.html">
-      <i class="fas fa-coins"></i> <!-- Biểu tượng Coins cho Jetton -->
-      <span>Jetton</span>
-    </a>
-    <!-- Thêm Profile thay vì Home và Shop -->
-    <a href="/profile/index.html" class="footer-item" data-page="profile.html">
-      <i class="fas fa-user"></i>
-      <span>Profile</span>
-    </a>
-  </footer>
 
+<footer>
+        <a href="/wallet/wallet2.html" class="footer-item" data-page="wallet">
+            <i class="fas fa-wallet"></i>
+            <span>Jetton</span>
+        </a>
+
+        <a href="/wallet/index.html" class="footer-item" data-page="ton">
+            <i class="fas fa-gem"></i> <span>TON</span>
+        </a>
+        <a href="/jetton/index.html" class="footer-item" data-page="jetton">
+            <i class="fas fa-coins"></i>
+            <span>Coin</span>
+
+        <a href="/profile/index.html" class="footer-item" data-page="profile">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+</footer>
   <script>
     const currentPage = location.pathname.split("/").pop();
     const items = document.querySelectorAll(".footer-item");
