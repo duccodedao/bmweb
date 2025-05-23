@@ -1,4 +1,5 @@
-// --- Global Constants ---
+
+// Global Constants ---
 const APP_CONFIG = {
     MANIFEST_URL: "https://bmweb.site/tonconnect-manifest.json",
     QR_CODE_WIDTH: 300,
@@ -699,7 +700,7 @@ async function fetchAndDisplayAllTransactions(walletAddressRaw) {
                     amountJetton,
                     jettonSymbol: jt.jetton.symbol || "JETTON",
                     jettonImage: jt.jetton.image || '/logo-coin/loi.png',
-                    jettonName: jt.jetton.name || "Unknown Jetton",
+                    jettonName: jt.jetton.name || "Unknown",
                     jettonAddressRaw: jettonAddressRaw,
                     jettonAddressB64url: jettonAddressB64url,
                     txHashRaw: event.event_id,
@@ -917,3 +918,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // toAddressInput.addEventListener('paste', handlePasteFromClipboard); // Đã xóa/chú thích theo yêu cầu trước
     initTelegramWebApp(); // Gọi hàm này để khởi tạo Telegram Web App nếu có
 });
+
+
+
+
+
+
+
+
+
+// const tg = window.Telegram.WebApp;
+tg.ready();
+// Nút back luôn luôn bật
+    tg.BackButton.show();
+
+    // Khi bấm vào nút back của Telegram
+    tg.BackButton.onClick(() => {
+      window.history.back(); // Quay lại trang trước khi người dùng mở trang này
+    });
