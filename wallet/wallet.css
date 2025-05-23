@@ -71,7 +71,7 @@ body {
   text-align: center;
   overflow-y: auto;
   max-height: 90vh;
-  margin-top: 20px; /* Adjust margin for better spacing */
+  margin-top: 65px; /* **Dòng này đây!** */
   margin-bottom: 20px;
   position: relative; /* For proper positioning of fixed elements inside */
 }
