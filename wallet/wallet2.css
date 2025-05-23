@@ -34,10 +34,10 @@ body {
 
 /* --- SweetAlert2 Customization --- */
 .swal-popup-custom {
-  top: 90px !important; /* Adjust distance from top */
+
   border-radius: 25px;
   background: var(--bg-color); /* Match neumorphism background */
-  box-shadow: 10px 10px 25px var(--dark-shadow), -10px -10px 25px var(--light-shadow); /* Neumorphism shadow */
+ 
   color: var(--text-color);
 }
 .swal2-title, .swal2-html-container { /* Style Swal text to match app */
@@ -46,13 +46,17 @@ body {
 
 /* --- Connect Only Section --- */
 #connect-only {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  /* Add padding for spacing */
-  padding: 20px;
-  min-height: 200px; /* Ensure it has some height */
+  flex-direction: column;
+
+ 
 }
 
 /* --- Main Container --- */
@@ -146,6 +150,7 @@ ul#transactions-list {
   height: 20px;
   border-radius: 50%; /* Make Jetton icons round */
   object-fit: cover;
+  margin-top: 5px;
 }
 
 .amount {
@@ -787,3 +792,16 @@ button i {
     border-radius: 15px;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
